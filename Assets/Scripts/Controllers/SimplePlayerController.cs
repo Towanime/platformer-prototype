@@ -27,9 +27,10 @@ public class SimplePlayerController : MonoBehaviour {
         bool grab = Input.GetButton("Fire1");
         if (grab)
         {
+            // don't allow the player to move
+            IsEnabled = false;
             // initiate grab and disable controller until is done
             grabSkill.Begin(facingRight?1:-1);
-            IsEnabled = false;
         }
 
         float move = Input.GetAxis("Horizontal");
