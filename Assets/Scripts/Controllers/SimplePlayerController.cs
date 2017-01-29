@@ -5,7 +5,7 @@ public class SimplePlayerController : MonoBehaviour {
     public float speed;             //Floating point variable to store the player's movement speed.
     public float maxSpeed;
     private bool facingRight = true;
-    private Rigidbody2D rigidbody;       //Store a reference to the Rigidbody2D component required to use 2D Physics.
+    private Rigidbody rigidbody;       //Store a reference to the Rigidbody2D component required to use 2D Physics.
     public bool isEnabled = true;
     // skills
     private Grab grabSkill;
@@ -14,7 +14,7 @@ public class SimplePlayerController : MonoBehaviour {
     void Start()
     {
         //Get and store a reference to the Rigidbody2D component so that we can access it.
-        rigidbody = GetComponent<Rigidbody2D>();
+        rigidbody = GetComponent<Rigidbody>();
         grabSkill = GetComponent<Grab>();
     }
 
@@ -25,12 +25,18 @@ public class SimplePlayerController : MonoBehaviour {
 
         // grab?
         bool grab = Input.GetButton("Fire1");
-        if (grab)
+        if (grab && grabSkill.CanAct())
         {
-            // don't allow the player to move
-            IsEnabled = false;
             // initiate grab and disable controller until is done
-            grabSkill.Begin(facingRight?1:-1);
+            if (grabSkill.IsHolding)
+            {
+                // destroys object
+                grabSkill.Crush();
+            }else
+            {
+                // if the grab initiates correctly then disable the controller!
+                IsEnabled = !grabSkill.Begin(facingRight ? 1 : -1);
+            }
         }
 
         float move = Input.GetAxis("Horizontal");

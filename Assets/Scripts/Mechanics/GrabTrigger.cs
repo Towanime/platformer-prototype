@@ -13,43 +13,13 @@ public class GrabTrigger : MonoBehaviour
     {
         grabComponent = GetComponentInParent<Grab>();
     }
-
-    public void OnCollisionEnter(Collision collision)
-    {
-
-    }
-
-    public void OnCollisionExit2D(Collision2D collision)
-    {
-
-    }
-
-    public void OnCollisionExit(Collision collision)
-    {
-
-    }
-
-    public void OnCollisionEnter2D(Collision2D collision)
-    {
-
-    }
-
+    
     public void OnTriggerEnter(Collider other)
     {
-
-    }
-
-    public void OnTriggerExit2D(Collider2D collision)
-    {
-
+        grabComponent.OnCollision(other);
     }
 
     public void OnTriggerExit(Collider other)
-    {
-
-    }
-
-    public void OnTriggerEnter2D(Collider2D collision)
     {
 
     }
