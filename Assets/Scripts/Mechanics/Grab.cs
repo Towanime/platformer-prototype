@@ -130,6 +130,8 @@ public class Grab : MonoBehaviour {
     public bool Crush()
     {
         if (grabbedEnemy == null) return false;
+        // kill the damn thing
+        grabbedEnemy.SendMessage("OnDeath");
         // destroy object
         Destroy(grabbedEnemy);
         grabbedEnemy = null;
