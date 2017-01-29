@@ -2,10 +2,8 @@
 using System.Collections;
 
 public class SimplePlayerController : MonoBehaviour {
-    public float speed;             //Floating point variable to store the player's movement speed.
-    public float maxSpeed;
-    private bool facingRight = true;
-    private Rigidbody rigidbody;       //Store a reference to the Rigidbody2D component required to use 2D Physics.
+    public PlayerInput playerInput;
+    public CharacterMovement characterMovement;
     public bool isEnabled = true;
     // skills
     private Grab grabSkill;
@@ -13,8 +11,6 @@ public class SimplePlayerController : MonoBehaviour {
     // Use this for initialization
     void Start()
     {
-        //Get and store a reference to the Rigidbody2D component so that we can access it.
-        rigidbody = GetComponent<Rigidbody>();
         grabSkill = GetComponent<Grab>();
     }
 
@@ -24,8 +20,7 @@ public class SimplePlayerController : MonoBehaviour {
         if (!isEnabled) return;
 
         // grab?
-        bool grab = Input.GetButton("Fire1");
-        if (grab && grabSkill.CanAct())
+        if (playerInput.grabbing && grabSkill.CanAct())
         {
             // initiate grab and disable controller until is done
             if (grabSkill.IsHolding)
@@ -35,29 +30,9 @@ public class SimplePlayerController : MonoBehaviour {
             }else
             {
                 // if the grab initiates correctly then disable the controller!
-                IsEnabled = !grabSkill.Begin(facingRight ? 1 : -1);
+                IsEnabled = !grabSkill.Begin((int)characterMovement.lastInputDirection);
             }
         }
-
-        float move = Input.GetAxis("Horizontal");
-
-        rigidbody.velocity = new Vector2(move * maxSpeed, rigidbody.velocity.y);
-
-        if (move > 0 && !facingRight)
-        {
-            Flip();
-        } else if (move < 0 && facingRight)
-        {
-            Flip();
-        }
-    }
-
-    private void Flip()
-    {
-        facingRight = !facingRight;
-        Vector3 localScale = transform.localScale;
-        localScale.x *= -1;
-        transform.localScale = localScale;
     }
 
     public bool IsEnabled
@@ -65,6 +40,7 @@ public class SimplePlayerController : MonoBehaviour {
         set
         {
             this.isEnabled = value;
+            this.characterMovement.processInput = value;
         }
         get
         {

@@ -2,6 +2,8 @@
 using System.Collections;
 
 public class CharacterMovement : MonoBehaviour {
+    public PlayerInput playerInput;
+    public bool processInput = true;
     public float maxGroundSpeed = 0.15f;
     public float currentGroundSpeed = 0f;
     public float groundAcceleration = 0.5f;
@@ -23,7 +25,7 @@ public class CharacterMovement : MonoBehaviour {
     /// Direction that the player was pressing in the last frame (-1 = left, 1 = right). 
     /// If the player is not pressing any direction then the last direction pressed is retained.
     /// </summary>
-    private float lastInputDirection = 1f;
+    public float lastInputDirection = 1f;
     // Rotation variables
     private Quaternion fromRotation;
     private Quaternion toRotation;
@@ -38,7 +40,7 @@ public class CharacterMovement : MonoBehaviour {
     void FixedUpdate()
     {
         // Either -1, 0 or 1
-        float horizontalInput = Input.GetAxisRaw("Horizontal");
+        float horizontalInput = GetHorizontalInput();
         // Either -1 or 1, see lastInputDirection for details.
         float currentInputDirection = lastInputDirection;
         if (horizontalInput != 0)
@@ -53,6 +55,17 @@ public class CharacterMovement : MonoBehaviour {
             movingDirection = Mathf.Sign(currentGroundSpeed);
         }
         lastInputDirection = currentInputDirection;
+    }
+
+    private float GetHorizontalInput()
+    {
+        // Either -1, 0 or 1
+        float horizontalInput = 0;
+        if (processInput)
+        {
+            horizontalInput = playerInput.direction;
+        }
+        return horizontalInput;
     }
 
     private void UpdateSpeed(float horizontalInput, float currentInputDirection)
