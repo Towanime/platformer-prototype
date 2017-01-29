@@ -15,14 +15,14 @@ public class PlayerInput : MonoBehaviour {
     void SetDirection()
     {
         this.direction = 0;
-        if (Input.GetKey(this.keyboardMouseConfig.left) || Input.GetKey(this.windowsGamepadConfig.left))
+        if (Input.GetKey(this.keyboardMouseConfig.left) || Input.GetAxisRaw("Horizontal") < 0)
         {
             this.direction = -1;
         }
-        else if (Input.GetKey(this.keyboardMouseConfig.right) || Input.GetKey(this.windowsGamepadConfig.right))
+        else if (Input.GetKey(this.keyboardMouseConfig.right) || Input.GetAxisRaw("Horizontal") > 0)
         {
             this.direction = 1;
         }
-        grabbing = Input.GetKey(this.keyboardMouseConfig.grab) || Input.GetKey(this.windowsGamepadConfig.grab);
+        grabbing = Input.GetKeyDown(this.keyboardMouseConfig.grab) || Input.GetKeyDown(this.windowsGamepadConfig.grab);
     }
 }
