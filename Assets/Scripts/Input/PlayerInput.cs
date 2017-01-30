@@ -8,6 +8,7 @@ public class PlayerInput : MonoBehaviour {
     public bool grabbing;
     public bool holdingJump;
     public bool jumped;
+    public bool shooting;
 
     void Update()
     {
@@ -28,5 +29,6 @@ public class PlayerInput : MonoBehaviour {
         grabbing = Input.GetKeyDown(this.keyboardMouseConfig.grab) || Input.GetKeyDown(this.windowsGamepadConfig.grab);
         jumped = Input.GetKeyDown(this.keyboardMouseConfig.jump) || Input.GetKeyDown(this.windowsGamepadConfig.jump);
         holdingJump = Input.GetKey(this.keyboardMouseConfig.jump) || Input.GetKey(this.windowsGamepadConfig.jump);
+        shooting = Input.GetKey(this.keyboardMouseConfig.shot) || Input.GetKey(this.windowsGamepadConfig.shot);
     }
 }

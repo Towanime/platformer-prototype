@@ -7,11 +7,13 @@ public class SimplePlayerController : MonoBehaviour {
     public bool isEnabled = true;
     // skills
     private Grab grabSkill;
+    private GatlingGun gatlingGun;
 
     // Use this for initialization
     void Start()
     {
         grabSkill = GetComponent<Grab>();
+        gatlingGun = GetComponent<GatlingGun>();
     }
 
     //FixedUpdate is called at a fixed interval and is independent of frame rate. Put physics code here.
@@ -19,7 +21,7 @@ public class SimplePlayerController : MonoBehaviour {
     {
         if (!isEnabled) return;
 
-        // grab?
+        // grab or fire?
         if (playerInput.grabbing && grabSkill.CanAct())
         {
             // initiate grab and disable controller until is done
@@ -32,6 +34,9 @@ public class SimplePlayerController : MonoBehaviour {
                 // if the grab initiates correctly then disable the controller!
                 IsEnabled = !grabSkill.Begin((int)characterMovement.lastInputDirection);
             }
+        } else if (playerInput.shooting) // shooting and throwing
+        {
+            gatlingGun.Fire();
         }
     }
 

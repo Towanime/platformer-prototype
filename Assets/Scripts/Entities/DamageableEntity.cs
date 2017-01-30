@@ -5,10 +5,10 @@ using UnityEngine;
 public class DamageableEntity : MonoBehaviour {
     public bool doDamage;
     public bool ignoreDamage = false;
-    public int life;
+    public float life;
     public GameObject spawnPoint;
     protected SpawnPoint spawn;
-    protected int currentLife;
+    protected float currentLife;
 
     void Start()
     {
@@ -25,7 +25,7 @@ public class DamageableEntity : MonoBehaviour {
         }
     }
 
-    public virtual void OnDamage(int damage)
+    public virtual void OnDamage(float damage)
     {
         if (ignoreDamage) return;
         currentLife -= damage;
@@ -62,7 +62,7 @@ public class DamageableEntity : MonoBehaviour {
         currentLife = life;
     }
 
-    public int Life
+    public float Life
     {
         get
         {
