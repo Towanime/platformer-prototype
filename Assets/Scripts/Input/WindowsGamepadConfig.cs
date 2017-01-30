@@ -7,4 +7,5 @@ public class WindowsGamepadConfig : MonoBehaviour
     public KeyCode right;
     public KeyCode jump;
     public KeyCode grab;
+    public KeyCode shot;
 }

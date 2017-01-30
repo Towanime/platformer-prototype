@@ -5,13 +5,14 @@ using UnityEngine;
 public class SpawnPoint : MonoBehaviour {
     public GameObject enemyPrefab;
     public float spawnTime;
+    public bool spawnOnAwake;
     private float currentSpawnTime;
     private bool waiting;
 
 
 	// Use this for initialization
 	void Start () {
-		
+        if (spawnOnAwake) waiting = true; // setup initial spawn
 	}
 	
 	// Update is called once per frame

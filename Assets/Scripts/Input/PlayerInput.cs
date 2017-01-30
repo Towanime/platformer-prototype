@@ -6,6 +6,7 @@ public class PlayerInput : MonoBehaviour {
     public WindowsGamepadConfig windowsGamepadConfig;
     public float direction;
     public bool grabbing;
+    public bool shooting;
 
     void Update()
     {
@@ -24,5 +25,6 @@ public class PlayerInput : MonoBehaviour {
             this.direction = 1;
         }
         grabbing = Input.GetKey(this.keyboardMouseConfig.grab) || Input.GetKey(this.windowsGamepadConfig.grab);
+        shooting = Input.GetKey(this.keyboardMouseConfig.shot) || Input.GetKey(this.windowsGamepadConfig.shot);
     }
 }
