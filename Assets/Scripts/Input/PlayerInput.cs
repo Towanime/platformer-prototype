@@ -6,6 +6,8 @@ public class PlayerInput : MonoBehaviour {
     public WindowsGamepadConfig windowsGamepadConfig;
     public float direction;
     public bool grabbing;
+    public bool holdingJump;
+    public bool jumped;
 
     void Update()
     {
@@ -24,5 +26,7 @@ public class PlayerInput : MonoBehaviour {
             this.direction = 1;
         }
         grabbing = Input.GetKeyDown(this.keyboardMouseConfig.grab) || Input.GetKeyDown(this.windowsGamepadConfig.grab);
+        jumped = Input.GetKeyDown(this.keyboardMouseConfig.jump) || Input.GetKeyDown(this.windowsGamepadConfig.jump);
+        holdingJump = Input.GetKey(this.keyboardMouseConfig.jump) || Input.GetKey(this.windowsGamepadConfig.jump);
     }
 }
