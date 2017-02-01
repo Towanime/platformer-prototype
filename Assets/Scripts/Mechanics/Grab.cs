@@ -1,15 +1,21 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Grab : MonoBehaviour {
+public class Grab : MonoBehaviour
+{
+    [Tooltip("Units from initial point to max distance.")]
     public float distance = 3;
+    [Tooltip("Speed for the arm.")]
     public float speed = 8f;
     public float speedPenalty = 1.5f;
+    [Tooltip("Cooldown before attepting another grab or crunch.")]
     // time before being able to grab again
     public float grabCooldown = 0.1f;
     // arm needs a rigid body and colission
+    [Tooltip("Arm on the model, need a rigid body, collission and be on the Grab layer.")]
     public GameObject arm;
     // empty object inside the player where the arm should always return
+    [Tooltip("Empty object inside the player where the arm should always return.")]
     public GameObject armAnchor;
     // empty object used to keep the target relative to the player in case it moves
     public GameObject armTarget;
@@ -30,9 +36,11 @@ public class Grab : MonoBehaviour {
     // cooldown vars
     private float currentCooldown;
     private bool wait;
+    // true when the arm is going and coming back
+    private bool isRunning;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         controller = GetComponent<SimplePlayerController>();
 	}
 
@@ -74,6 +82,8 @@ public class Grab : MonoBehaviour {
             // check destination
             if (fracJourney >= 1)
             {
+                // not traveling anymore
+                isRunning = false;
                 // finish grab
                 End();
                 Debug.Log("Arm returned empty handed! At: " + arm.transform.position.ToString());
@@ -88,6 +98,8 @@ public class Grab : MonoBehaviour {
         thrown = true;
         grabbedEnemy = null;
         returnPenalty = 0;
+        // bool so other components know when it's working
+        isRunning = true;
         // data to lerp it in the update
         startTime = Time.time;
 
@@ -195,6 +207,14 @@ public class Grab : MonoBehaviour {
         get
         {
             return this.isEnabled;
+        }
+    }
+
+    public bool IsRunning
+    {
+        get
+        {
+            return this.isRunning;
         }
     }
 }
