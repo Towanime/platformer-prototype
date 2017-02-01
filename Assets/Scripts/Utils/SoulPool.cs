@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BulletPool : BasicPool {
-    public static BulletPool instance;
+public class SoulPool : BasicPool
+{
+    public static SoulPool instance;
 
     void Awake()
     {
