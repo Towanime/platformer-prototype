@@ -18,21 +18,23 @@ public class CharacterMovement : MonoBehaviour {
     /// <summary>
     /// Used when moving in one direction while pressing the other
     /// </summary>
+    [Tooltip("Used when moving in one direction while pressing the other")]
     public float reactivityPercent = 0.5f;
     /// <summary>
     /// How much time the rotation will take until the character 
     /// faces the same direction that is being pressed
     /// </summary>
+    [Tooltip("How much time the rotation will take until the character faces the same direction that is being pressed")]
     public float timeToFlipFacingDirection = 0.2f;
     /// <summary>
-    /// Direction in which the character is moving
+    /// Direction in which the character is moving (-1 = left, 1 = right).
     /// </summary>
     private float movingDirection = 1f;
     /// <summary>
     /// Direction that the player was pressing in the last frame (-1 = left, 1 = right). 
     /// If the player is not pressing any direction then the last direction pressed is retained.
     /// </summary>
-    public float lastInputDirection = 1f;
+    private float lastInputDirection = 1f;
 
     // Rotation variables
     private Quaternion fromRotation;
@@ -50,11 +52,13 @@ public class CharacterMovement : MonoBehaviour {
     /// Max speed that the character can have when falling down, 
     /// represented with positive numbers.
     /// </summary>
+    [Tooltip("Max speed that the character can have when falling down, represented with positive numbers.")]
     public float maxFallingSpeed = 0.3f;
     /// <summary>
     /// One time modified given to the vertical 
     /// speed when the jump button is pressed.
     /// </summary>
+    [Tooltip("One time modified given to the vertical speed when the jump button is pressed.")]
     public float jumpImpulse = 0.35f;
     public float gravity = 1.4f;
     /// <summary>
@@ -62,21 +66,25 @@ public class CharacterMovement : MonoBehaviour {
     /// is ascending, used to make gravity lower so the character spends 
     /// more time going up than going down.
     /// </summary>
+    [Tooltip("Modifier applied to gravity when the character has jumped and is ascending, used to make gravity lower so the character spends more time going up than going down.")]
     public float gravityAscensionModifier = 0.7f;
     /// <summary>
     /// Minimum time that the character has to be in the air after jumping, 
     /// used to set a limit for short jumps.
     /// </summary>
+    [Tooltip("Minimum time that the character has to be in the air after jumping, used to set a limit for short jumps.")]
     public float minJumpTime = 0.1f;
     /// <summary>
     /// Maximum vertical speed that the player can have when the jump button is 
     /// not being held anymore, only applied after the time in minJumpTime has passed.
     /// </summary>
+    [Tooltip("Maximum vertical speed that the player can have when the jump button is not being held anymore, only applied after the time in minJumpTime has passed.")]
     public float cutJumpSpeedLimit = 0.05f;
     /// <summary>
     /// Time given for a character to still be able to jump after 
     /// it has fallen of a ledge.
     /// </summary>
+    [Tooltip("Time given for a character to still be able to jump after it has fallen of a ledge.")]
     public float jumpCallTolerance = 0.2f;
     public bool grounded;
     private float timeInTheAir = 0f;
@@ -99,7 +107,7 @@ public class CharacterMovement : MonoBehaviour {
         {
             currentInputDirection = horizontalInput;
         }
-        grounded = IsGrounded();
+        grounded = IsGroundedInternal();
         UpdateSpeed(grounded, horizontalInput, currentInputDirection);
         if (freezeMovement)
         {
@@ -115,7 +123,7 @@ public class CharacterMovement : MonoBehaviour {
         lastInputDirection = currentInputDirection;
     }
 
-    private bool IsGrounded()
+    private bool IsGroundedInternal()
     {
         return characterController.isGrounded;
     }
@@ -126,17 +134,21 @@ public class CharacterMovement : MonoBehaviour {
         return (processInput) ? playerInput.direction : 0;
     }
 
-    void Update()
+    public void Jump()
     {
-        // Do jump detection in Update() loop because its less likely to miss inputs than FixedUpdate()
-        grounded = IsGrounded();
-        timeInTheAir = (grounded) ? 0 : timeInTheAir + Time.deltaTime;
         bool canJump = grounded || timeInTheAir <= jumpCallTolerance;
-        if (processInput && playerInput.jumped && canJump)
+        if (processInput && canJump)
         {
             cutJumpShort = false;
             characterJustJumped = true;
         }
+    }
+
+    void Update()
+    {
+        grounded = IsGroundedInternal();
+        // Do jump detection in Update() loop because its less likely to miss inputs than FixedUpdate()
+        timeInTheAir = (grounded) ? 0 : timeInTheAir + Time.deltaTime;
     }
 
     private void UpdateSpeed(bool grounded, float horizontalInput, float currentInputDirection)
@@ -256,5 +268,15 @@ public class CharacterMovement : MonoBehaviour {
                 rotating = false;
             }
         }
+    }
+
+    public bool IsGrounded
+    {
+        get { return grounded; }
+    }
+
+    public float LastInputDirection
+    {
+        get { return lastInputDirection; }
     }
 }
