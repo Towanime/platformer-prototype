@@ -73,7 +73,7 @@ public class GatlingGun : MonoBehaviour {
         // where is it aiming?
         //bullet.transform.rotation = emitor.transform.rotation;
         Bullet component = bullet.GetComponent<Bullet>();
-        component.SetDirection( (int) characterMovement.lastInputDirection);
+        component.SetDirection( (int) characterMovement.LastInputDirection);
         if (overrideBulletSpeed)
         {
             component.speed = bulletSpeed;
