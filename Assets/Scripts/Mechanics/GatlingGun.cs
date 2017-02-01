@@ -9,16 +9,14 @@ public class GatlingGun : MonoBehaviour {
     public GameObject emitor;
     // 
     [Tooltip("Delay between bullets.")]
-    public float fireRate;
+    public float fireRate = 0.05f;
     [Tooltip("Optional bullet speed, this will override the speed on the bullet prefab if overrideBulletSpeed is set to true.")]
     public float bulletSpeed;
     [Tooltip("If true it will override the bullet's prefab speed with the one on this component.")]
     public bool overrideBulletSpeed;
-    [Tooltip("Number of bullets until the gun has to cool down, use this and overheat rate for tuning.")]
-    public float overheatLimit = 150;
-    [Tooltip("Multiplier for the overheat gauge, this value will increase the overheat N times per bullet.")]
-    public float overheatRate = 6;
-    [Tooltip("Recover rate for the gun when not shooting.")]
+    [Tooltip("Time in seconds of continuous firing until the gun has to cool down, use this for tuning.")]
+    public float overheatLimit = 5;
+    [Tooltip("Multiplier for how fast the overheat should recover when not shooting. Ex: if overheatLimit is 6s, a value of 2 will make it recover in 3s.")]
     public float recoverRate = 2;
     public bool isEnabled = true;
     [Tooltip("Temporal way to show the overheat.")]
@@ -27,8 +25,9 @@ public class GatlingGun : MonoBehaviour {
     // cooldown vars
     private float currentCooldown;
     private bool wait;
-    private float currentOverheat;
+    public float currentOverheat;
     // did it got overheated?
+    private bool isFiringGun = false;
     private bool isOverheated;
 
     // Use this for initialization
@@ -37,56 +36,52 @@ public class GatlingGun : MonoBehaviour {
         controller = GetComponent<SimplePlayerController>();
     }
 
-    void Update()
+    void FixedUpdate()
     {
         if (wait)
         {
-            currentCooldown += Time.deltaTime;
+            currentCooldown += Time.fixedDeltaTime;
             // turn off wait if the time is up
             if (currentCooldown >= fireRate)
             {
                 wait = false;
             }
         }
-        else
-        {
-            // if it has overheat then recover
-            if(currentOverheat >= 0)
-            {
-                // start recovering if the gun is in no use or waiting to be used again
-                currentOverheat = Mathf.Clamp(currentOverheat - (overheatRate * recoverRate), 0, overheatLimit);
-                // got cooled down?
-                if (currentOverheat <= 0) isOverheated = false;
-                UpdateLabel();
-            }
-        }
+        // Update the overheat counter, go up if firing the gun and down if not firing it.
+        float overheatModifier = Time.fixedDeltaTime * (isFiringGun ? 1 : -recoverRate);
+        currentOverheat = Mathf.Clamp(currentOverheat + overheatModifier, 0, overheatLimit);
+        // Update the isOverheated value
+        if (currentOverheat <= 0) isOverheated = false;
+        if (currentOverheat >= overheatLimit) isOverheated = true;
+        UpdateLabel();
+        isFiringGun = false;
     }
+
     /// <summary>
     /// Fires a bullet
     /// </summary>
     public void Fire()
     {
-        if (!isEnabled || isOverheated || wait) return;
-        GameObject bullet = BulletPool.instance.GetObject();
-        // set bullet position and start moving?
-        bullet.transform.position = emitor.transform.position;
-        // where is it aiming?
-        //bullet.transform.rotation = emitor.transform.rotation;
-        Bullet component = bullet.GetComponent<Bullet>();
-        component.SetDirection( (int) characterMovement.LastInputDirection);
-        if (overrideBulletSpeed)
+        if (!isEnabled || isOverheated) return;
+        isFiringGun = true;
+        if (!wait)
         {
-            component.speed = bulletSpeed;
+            GameObject bullet = BulletPool.instance.GetObject();
+            // set bullet position and start moving?
+            bullet.transform.position = emitor.transform.position;
+            // where is it aiming?
+            //bullet.transform.rotation = emitor.transform.rotation;
+            Bullet component = bullet.GetComponent<Bullet>();
+            component.SetDirection((int)characterMovement.LastInputDirection);
+            if (overrideBulletSpeed)
+            {
+                component.speed = bulletSpeed;
+            }
+            bullet.SetActive(true);
+            // start cooldown
+            wait = true;
+            currentCooldown = 0;
         }
-        bullet.SetActive(true);
-        // start cooldown
-        wait = true;
-        currentCooldown = 0;
-        // increate overheat!
-        currentOverheat += overheatRate;
-        // is overheated?
-        if (currentOverheat >= overheatLimit) isOverheated = true;
-        UpdateLabel();
     }
 
     private void UpdateLabel()
@@ -99,6 +94,14 @@ public class GatlingGun : MonoBehaviour {
         get
         {
             return this.isOverheated;
+        }
+    }
+
+    public bool IsFiringGun
+    {
+        get
+        {
+            return this.isFiringGun;
         }
     }
 }
