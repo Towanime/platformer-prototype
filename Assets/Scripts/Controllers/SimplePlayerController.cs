@@ -21,6 +21,7 @@ public class SimplePlayerController : MonoBehaviour {
     {
         if (!isEnabled) return;
 
+        bool freezeMovement = false;
         // grab or fire?
         if (playerInput.grabbing && grabSkill.CanAct())
         {
@@ -36,8 +37,13 @@ public class SimplePlayerController : MonoBehaviour {
             }
         } else if (playerInput.shooting) // shooting and throwing
         {
+            if (!characterMovement.grounded)
+            {
+                freezeMovement = true;
+            }
             gatlingGun.Fire();
         }
+        characterMovement.freezeMovement = freezeMovement;
     }
 
     public bool IsEnabled

@@ -4,6 +4,7 @@ using System.Collections;
 public class CharacterMovement : MonoBehaviour {
     public PlayerInput playerInput;
     public bool processInput = true;
+    public bool freezeMovement = false;
     private CharacterController characterController;
     private Vector2 tmpVector2 = Vector2.zero;
     private Vector3 tmpVector3 = Vector3.zero;
@@ -77,6 +78,7 @@ public class CharacterMovement : MonoBehaviour {
     /// it has fallen of a ledge.
     /// </summary>
     public float jumpCallTolerance = 0.2f;
+    public bool grounded;
     private float timeInTheAir = 0f;
     private float timeSinceJumpStarted = 0f;
     private bool cutJumpShort = false;
@@ -97,8 +99,13 @@ public class CharacterMovement : MonoBehaviour {
         {
             currentInputDirection = horizontalInput;
         }
-        bool grounded = IsGrounded();
+        grounded = IsGrounded();
         UpdateSpeed(grounded, horizontalInput, currentInputDirection);
+        if (freezeMovement)
+        {
+            currentHorizontalSpeed = 0;
+            currentVerticalSpeed = 0;
+        }
         UpdatePosition();
         UpdateRotation(currentInputDirection);
         if (currentHorizontalSpeed != 0)
@@ -122,7 +129,7 @@ public class CharacterMovement : MonoBehaviour {
     void Update()
     {
         // Do jump detection in Update() loop because its less likely to miss inputs than FixedUpdate()
-        bool grounded = IsGrounded();
+        grounded = IsGrounded();
         timeInTheAir = (grounded) ? 0 : timeInTheAir + Time.deltaTime;
         bool canJump = grounded || timeInTheAir <= jumpCallTolerance;
         if (processInput && playerInput.jumped && canJump)
