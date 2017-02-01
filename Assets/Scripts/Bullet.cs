@@ -7,7 +7,7 @@ public class Bullet : MonoBehaviour
     public float damage;
     public float lifeSpan = 2;
     public float speed = 5;
-    private int direction; // 1 or -1
+    private Vector2 direction; // 1 or -1
 
     // Use this for initialization
     void Start()
@@ -18,7 +18,7 @@ public class Bullet : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.Translate(speed * Time.deltaTime * direction, 0, 0);
+        transform.Translate(speed * Time.deltaTime * direction.x, speed * Time.deltaTime * direction.y, 0);
     }
 
     void OnEnable()
@@ -56,8 +56,8 @@ public class Bullet : MonoBehaviour
         Destroy();
     }
 
-    public void SetDirection(int direction)
+    public void SetDirection(float x, float y)
     {
-        this.direction = direction;
+        this.direction.Set(x, y);
     }
 }

@@ -11,7 +11,6 @@ public class CharacterMovement : MonoBehaviour {
 
     // Horizontal movement variables
     public float maxGroundSpeed = 0.15f;
-    public float currentHorizontalSpeed = 0f;
     public float groundAcceleration = 0.5f;
     public float groundFriction = 1.2f;
     public float airFriction = 0.2f;
@@ -26,6 +25,7 @@ public class CharacterMovement : MonoBehaviour {
     /// </summary>
     [Tooltip("How much time the rotation will take until the character faces the same direction that is being pressed")]
     public float timeToFlipFacingDirection = 0.2f;
+    private float currentHorizontalSpeed = 0f;
     /// <summary>
     /// Direction in which the character is moving (-1 = left, 1 = right).
     /// </summary>
@@ -47,7 +47,6 @@ public class CharacterMovement : MonoBehaviour {
     private bool rotating = false;
 
     // Vertical movement variables
-    public float currentVerticalSpeed = 0f;
     /// <summary>
     /// Max speed that the character can have when falling down, 
     /// represented with positive numbers.
@@ -86,7 +85,8 @@ public class CharacterMovement : MonoBehaviour {
     /// </summary>
     [Tooltip("Time given for a character to still be able to jump after it has fallen of a ledge.")]
     public float jumpCallTolerance = 0.2f;
-    public bool grounded;
+    private bool grounded;
+    private float currentVerticalSpeed = 0f;
     private float timeInTheAir = 0f;
     private float timeSinceJumpStarted = 0f;
     private bool cutJumpShort = false;
