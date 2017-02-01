@@ -8,7 +8,6 @@ public class SimplePlayerController : MonoBehaviour {
     // skills
     private Grab grabSkill;
     private GatlingGun gatlingGun;
-    private bool firing = false;
 
     // Use this for initialization
     void Start()
@@ -37,12 +36,12 @@ public class SimplePlayerController : MonoBehaviour {
             }
         }
         // Jump only if not firing the gun and not using the grab skill
-        if (playerInput.jumped && !grabSkill.IsRunning && !firing)
+        if (playerInput.jumped && !grabSkill.IsRunning && !gatlingGun.IsFiringGun)
         {
             characterMovement.Jump();
         }
         // Freeze movement if the player is in the air while firing the gun or using the grab skill
-        if (!characterMovement.IsGrounded && (firing || grabSkill.IsRunning))
+        if (!characterMovement.IsGrounded && (gatlingGun.IsFiringGun || grabSkill.IsRunning))
         {
             characterMovement.freezeMovement = true;
         } else
@@ -59,10 +58,6 @@ public class SimplePlayerController : MonoBehaviour {
         if (playerInput.shooting) // shooting and throwing
         {
             gatlingGun.Fire();
-            firing = true;
-        } else
-        {
-            firing = false;
         }
     }
 
