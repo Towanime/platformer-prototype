@@ -39,6 +39,7 @@ public class CharacterMovement : MonoBehaviour {
     // Rotation variables
     private Quaternion fromRotation;
     private Quaternion toRotation;
+    private Quaternion originalRotation;
     private float currentRotationTime = 0f;
     /// <summary>
     /// True if the character's rotation is being adjusted to 
@@ -95,6 +96,7 @@ public class CharacterMovement : MonoBehaviour {
     void Start()
     {
         characterController = GetComponent<CharacterController>();
+        originalRotation = transform.localRotation;
     }
     
     void FixedUpdate()
@@ -262,7 +264,7 @@ public class CharacterMovement : MonoBehaviour {
             // Lerp between original and new rotation
             currentRotationTime += Time.fixedDeltaTime;
             float delta = currentRotationTime / timeToFlipFacingDirection;
-            transform.rotation = Quaternion.Slerp(fromRotation, toRotation, delta);
+            transform.rotation = Quaternion.Slerp(fromRotation, toRotation, delta) * originalRotation;
             if (currentRotationTime >= timeToFlipFacingDirection)
             {
                 rotating = false;
