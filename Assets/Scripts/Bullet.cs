@@ -18,7 +18,7 @@ public class Bullet : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.Translate(speed * Time.deltaTime * direction.x, speed * Time.deltaTime * direction.y, 0);
+        transform.Translate(speed * Time.deltaTime * direction.x, speed * Time.deltaTime * direction.y, 0, Space.World);
     }
 
     void OnEnable()
@@ -56,8 +56,10 @@ public class Bullet : MonoBehaviour
         Destroy();
     }
 
-    public void SetDirection(float x, float y)
+    public void SetDirection(Vector2 direction)
     {
-        this.direction.Set(x, y);
+        this.direction.Set(direction.x, direction.y);
+        var angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
     }
 }

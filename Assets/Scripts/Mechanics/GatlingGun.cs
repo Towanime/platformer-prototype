@@ -32,6 +32,7 @@ public class GatlingGun : MonoBehaviour {
     private bool isFiringGun = false;
     private bool lastFiringGun = false;
     private bool isOverheated;
+    private Vector2 tmp;
 
     void FixedUpdate()
     {
@@ -65,20 +66,9 @@ public class GatlingGun : MonoBehaviour {
         if (!wait)
         {
             GameObject bullet = BulletPool.instance.GetObject();
-            // Randomize position of the bullet by a position offset;
-            Vector2 spawnPosition = emitor.transform.position;
-            spawnPosition.y += Random.Range(-bulletSpawnPositionRandomOffset, bulletSpawnPositionRandomOffset);
-            bullet.transform.position = spawnPosition;
-            // Randomize angle of the bullet by an angle offset;
+            bullet.transform.position = GetBulletSpawnPosition();
             Bullet component = bullet.GetComponent<Bullet>();
-            float angle = Random.Range(-bulletAngleRandomOffset, bulletAngleRandomOffset);
-            if (characterMovement.LastInputDirection < 0)
-            {
-                angle += 180;
-            }
-            float directionX = Mathf.Cos(angle * Mathf.Deg2Rad);
-            float directionY = Mathf.Sin(angle * Mathf.Deg2Rad);
-            component.SetDirection(directionX, directionY);
+            component.SetDirection(GetBulletDirection());
             if (overrideBulletSpeed)
             {
                 component.speed = bulletSpeed;
@@ -88,6 +78,41 @@ public class GatlingGun : MonoBehaviour {
             wait = true;
             currentCooldown = 0;
         }
+    }
+
+    private Vector2 GetBulletSpawnPosition()
+    {
+        Vector2 spawnPosition = emitor.transform.position;
+        // Randomize position of the bullet by a position offset;
+        float randomOffset = Random.Range(-bulletSpawnPositionRandomOffset, bulletSpawnPositionRandomOffset);
+        // Add offset but first convert it to the angle of the spawn point
+        float emitorAngle = emitor.transform.rotation.eulerAngles.z;
+        float cos = Mathf.Cos(emitorAngle * Mathf.Deg2Rad);
+        float sin = Mathf.Sin(emitorAngle * Mathf.Deg2Rad);
+        float tx = 0;
+        float ty = randomOffset;
+        tmp.x = cos * tx - sin * ty;
+        tmp.y = sin * tx + cos * ty;
+        if (characterMovement.LastInputDirection < 0)
+        {
+            tmp = Vector2.Reflect(tmp, Vector2.right);
+        }
+        spawnPosition += tmp;
+        return spawnPosition;
+    }
+
+    private Vector2 GetBulletDirection()
+    {
+        // Randomize direction of the bullet by an offset;
+        float angle = Random.Range(-bulletAngleRandomOffset, bulletAngleRandomOffset);
+        angle += emitor.transform.rotation.eulerAngles.z;
+        tmp.x = Mathf.Cos(angle * Mathf.Deg2Rad);
+        tmp.y = Mathf.Sin(angle * Mathf.Deg2Rad);
+        if (characterMovement.LastInputDirection < 0)
+        {
+            tmp = Vector2.Reflect(tmp, Vector2.right);
+        }
+        return tmp;
     }
 
     private void UpdateLabel()
