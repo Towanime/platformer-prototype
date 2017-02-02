@@ -1455,7 +1455,7 @@ ModelImporter:
     - serializedVersion: 16
       name: Arm Extended
       takeName: Take 001
-      firstFrame: 326
+      firstFrame: 325
       lastFrame: 326
       wrapMode: 0
       orientationOffsetY: 0
@@ -1707,7 +1707,7 @@ ModelImporter:
     - serializedVersion: 16
       name: Arm Hold
       takeName: Take 001
-      firstFrame: 327
+      firstFrame: 326
       lastFrame: 327
       wrapMode: 0
       orientationOffsetY: 0
@@ -2211,7 +2211,7 @@ ModelImporter:
     - serializedVersion: 16
       name: Shadow Walk
       takeName: Take 001
-      firstFrame: 333
+      firstFrame: 332
       lastFrame: 333
       wrapMode: 0
       orientationOffsetY: 0
