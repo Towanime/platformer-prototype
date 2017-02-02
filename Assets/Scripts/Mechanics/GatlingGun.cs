@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class GatlingGun : MonoBehaviour {
     public CharacterMovement characterMovement;
+    public Animator animator;
     [Tooltip("Object from where the bullets will spawn. Recomended an empty object with no collisions.")]
     public GameObject emitor;
     [Tooltip("Offset in degrees used to randomize the direction of the bullet. Ex: if the bullet is going right and the value is 5, the angle will be randomized in a range of -5 to 5.")]
@@ -54,14 +55,15 @@ public class GatlingGun : MonoBehaviour {
         UpdateLabel();
         lastFiringGun = isFiringGun;
         isFiringGun = false;
+        animator.SetBool("IsShooting", lastFiringGun);
     }
 
     /// <summary>
     /// Fires a bullet
     /// </summary>
-    public void Fire()
+    public bool Fire()
     {
-        if (!isEnabled || isOverheated) return;
+        if (!isEnabled || isOverheated) return false;
         isFiringGun = true;
         if (!wait)
         {
@@ -77,7 +79,9 @@ public class GatlingGun : MonoBehaviour {
             // start cooldown
             wait = true;
             currentCooldown = 0;
+            return true;
         }
+        return false;
     }
 
     private Vector2 GetBulletSpawnPosition()

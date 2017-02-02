@@ -4,6 +4,7 @@ using System.Collections;
 public class SimplePlayerController : MonoBehaviour {
     public PlayerInput playerInput;
     public CharacterMovement characterMovement;
+    public Animator animator;
     public bool isEnabled = true;
     // skills
     private Grab grabSkill;
@@ -58,6 +59,11 @@ public class SimplePlayerController : MonoBehaviour {
         if (playerInput.shooting) // shooting and throwing
         {
             gatlingGun.Fire();
+           // animator.SetBool("IsShooting", gatlingGun.Fire());
+        }
+        else
+        {
+           // animator.SetBool("IsShooting", false);
         }
     }
 
