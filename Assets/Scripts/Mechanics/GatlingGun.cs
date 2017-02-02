@@ -30,6 +30,7 @@ public class GatlingGun : MonoBehaviour {
     private float currentOverheat;
     // did it got overheated?
     private bool isFiringGun = false;
+    private bool lastFiringGun = false;
     private bool isOverheated;
 
     void FixedUpdate()
@@ -50,6 +51,7 @@ public class GatlingGun : MonoBehaviour {
         if (currentOverheat <= 0) isOverheated = false;
         if (currentOverheat >= overheatLimit) isOverheated = true;
         UpdateLabel();
+        lastFiringGun = isFiringGun;
         isFiringGun = false;
     }
 
@@ -105,7 +107,7 @@ public class GatlingGun : MonoBehaviour {
     {
         get
         {
-            return this.isFiringGun;
+            return this.lastFiringGun;
         }
     }
 }
