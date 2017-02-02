@@ -5,6 +5,7 @@ public class CharacterMovement : MonoBehaviour {
     public PlayerInput playerInput;
     public bool processInput = true;
     public bool freezeMovement = false;
+    public Animator animator;
     private CharacterController characterController;
     private Vector2 tmpVector2 = Vector2.zero;
     private Vector3 tmpVector3 = Vector3.zero;
@@ -149,6 +150,7 @@ public class CharacterMovement : MonoBehaviour {
     void Update()
     {
         grounded = IsGroundedInternal();
+        animator.SetBool("IsJumping", !grounded);
         // Do jump detection in Update() loop because its less likely to miss inputs than FixedUpdate()
         timeInTheAir = (grounded) ? 0 : timeInTheAir + Time.deltaTime;
     }
@@ -163,6 +165,7 @@ public class CharacterMovement : MonoBehaviour {
     {
         bool pressingDirection = horizontalInput != 0;
         bool moving = currentHorizontalSpeed != 0;
+        animator.SetBool("IsRunning", moving);
         if (moving && !pressingDirection)
         {
             float friction = (grounded) ? groundFriction : airFriction;
