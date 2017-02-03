@@ -33,7 +33,7 @@ public class SimplePlayerController : MonoBehaviour {
             else
             {
                 // if the grab initiates correctly then disable the controller!
-                IsEnabled = !grabSkill.Begin((int)characterMovement.LastInputDirection);
+                IsEnabled = !grabSkill.Begin((int)characterMovement.FacingDirection);
             }
         }
         // Jump only if not firing the gun and not using the grab skill
