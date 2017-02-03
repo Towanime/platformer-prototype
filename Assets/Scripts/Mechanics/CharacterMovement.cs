@@ -234,8 +234,11 @@ public class CharacterMovement : MonoBehaviour {
 
     private void UpdatePosition()
     {
-        tmpVector2.Set(currentHorizontalSpeed, currentVerticalSpeed);
-        characterController.Move(tmpVector2);
+        if (!freezeMovement)
+        {
+            tmpVector2.Set(currentHorizontalSpeed, currentVerticalSpeed);
+            characterController.Move(tmpVector2);
+        }
     }
 
     private void UpdateRotation(float currentInputDirection)

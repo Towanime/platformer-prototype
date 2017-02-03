@@ -8,12 +8,14 @@ public class SimplePlayerController : MonoBehaviour {
     // skills
     private Grab grabSkill;
     private GatlingGun gatlingGun;
+    private Teleport teleport;
 
     // Use this for initialization
     void Start()
     {
         grabSkill = GetComponent<Grab>();
         gatlingGun = GetComponent<GatlingGun>();
+        teleport = GetComponentInChildren<Teleport>();
     }
 
     void Update()
@@ -41,12 +43,16 @@ public class SimplePlayerController : MonoBehaviour {
             characterMovement.Jump();
         }
         // Freeze movement if the player is in the air while firing the gun or using the grab skill
-        if (!characterMovement.IsGrounded && (gatlingGun.IsFiringGun || grabSkill.IsRunning))
+        if (teleport.IsTeleporting || (!characterMovement.IsGrounded && (gatlingGun.IsFiringGun || grabSkill.IsRunning)))
         {
             characterMovement.freezeMovement = true;
         } else
         {
             characterMovement.freezeMovement = false;
+        }
+        if (playerInput.teleported && teleport.HasTarget)
+        {
+            teleport.DoTeleport();
         }
     }
 

@@ -8,4 +8,5 @@ public class KeyboardMouseConfig : MonoBehaviour
     public KeyCode jump;
     public KeyCode grab;
     public KeyCode shot;
+    public KeyCode teleport;
 }

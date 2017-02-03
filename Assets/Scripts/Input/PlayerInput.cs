@@ -9,6 +9,7 @@ public class PlayerInput : MonoBehaviour {
     public bool holdingJump;
     public bool jumped;
     public bool shooting;
+    public bool teleported;
 
     void Update()
     {
@@ -28,6 +29,7 @@ public class PlayerInput : MonoBehaviour {
         }
         grabbed = Input.GetKeyDown(this.keyboardMouseConfig.grab) || Input.GetKeyDown(this.windowsGamepadConfig.grab);
         jumped = Input.GetKeyDown(this.keyboardMouseConfig.jump) || Input.GetKeyDown(this.windowsGamepadConfig.jump);
+        teleported = Input.GetKeyDown(this.keyboardMouseConfig.teleport) || Input.GetKeyDown(this.windowsGamepadConfig.teleport);
         holdingJump = Input.GetKey(this.keyboardMouseConfig.jump) || Input.GetKey(this.windowsGamepadConfig.jump);
         shooting = Input.GetKey(this.keyboardMouseConfig.shot) || Input.GetKey(this.windowsGamepadConfig.shot);
     }
