@@ -35,7 +35,7 @@ public class CharacterMovement : MonoBehaviour {
     /// Direction that the player was pressing in the last frame (-1 = left, 1 = right). 
     /// If the player is not pressing any direction then the last direction pressed is retained.
     /// </summary>
-    private float lastInputDirection = 1f;
+    private float facingDirection = 1f;
 
     // Rotation variables
     private Quaternion fromRotation;
@@ -105,7 +105,7 @@ public class CharacterMovement : MonoBehaviour {
         // Either -1, 0 or 1
         float horizontalInput = GetHorizontalInput();
         // Either -1 or 1, see lastInputDirection for details.
-        float currentInputDirection = lastInputDirection;
+        float currentInputDirection = facingDirection;
         if (horizontalInput != 0)
         {
             currentInputDirection = horizontalInput;
@@ -123,7 +123,7 @@ public class CharacterMovement : MonoBehaviour {
         {
             movingDirection = Mathf.Sign(currentHorizontalSpeed);
         }
-        lastInputDirection = currentInputDirection;
+        facingDirection = currentInputDirection;
     }
 
     private bool IsGroundedInternal()
@@ -134,7 +134,7 @@ public class CharacterMovement : MonoBehaviour {
     private float GetHorizontalInput()
     {
         // Either -1, 0 or 1
-        return (processInput) ? playerInput.direction : 0;
+        return (processInput) ? playerInput.horizontalDirection : 0;
     }
 
     public void Jump()
@@ -245,7 +245,7 @@ public class CharacterMovement : MonoBehaviour {
     {
         Vector3 forward = transform.forward;
         // Start a new rotation only if the direction input has changed
-        if (currentInputDirection != lastInputDirection)
+        if (currentInputDirection != facingDirection)
         {
             // First calculate the currentRotationTime instead of setting it 
             // straight to 0 in case the character was already rotating when 
@@ -280,8 +280,8 @@ public class CharacterMovement : MonoBehaviour {
         get { return grounded; }
     }
 
-    public float LastInputDirection
+    public float FacingDirection
     {
-        get { return lastInputDirection; }
+        get { return facingDirection; }
     }
 }
