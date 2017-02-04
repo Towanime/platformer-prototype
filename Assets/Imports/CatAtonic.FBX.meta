@@ -1,0 +1,322 @@
+fileFormatVersion: 2
+guid: 698c8ae661f4c944087cf94f690af851
+timeCreated: 1486170069
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: Bone001
+    100002: Bone002
+    100004: Bone003
+    100006: Bone004
+    100008: Bone005
+    100010: //RootNode
+    100012: CatHead
+    100014: CatLeaves
+    100016: CatLeftEar
+    100018: CatLeftEye
+    100020: CatNose
+    100022: CatRightEar
+    100024: CatRightEye
+    100026: CatStem
+    100028: Spike1
+    100030: Spike2
+    100032: Spike3
+    100034: Spike4
+    100036: Spike5
+    100038: Spike6
+    100040: Spike7
+    100042: Spike8
+    100044: Spike9
+    400000: Bone001
+    400002: Bone002
+    400004: Bone003
+    400006: Bone004
+    400008: Bone005
+    400010: //RootNode
+    400012: CatHead
+    400014: CatLeaves
+    400016: CatLeftEar
+    400018: CatLeftEye
+    400020: CatNose
+    400022: CatRightEar
+    400024: CatRightEye
+    400026: CatStem
+    400028: Spike1
+    400030: Spike2
+    400032: Spike3
+    400034: Spike4
+    400036: Spike5
+    400038: Spike6
+    400040: Spike7
+    400042: Spike8
+    400044: Spike9
+    2300000: CatHead
+    2300002: CatLeaves
+    2300004: CatLeftEar
+    2300006: CatLeftEye
+    2300008: CatNose
+    2300010: CatRightEar
+    2300012: CatRightEye
+    2300014: Spike1
+    2300016: Spike2
+    2300018: Spike3
+    2300020: Spike4
+    2300022: Spike5
+    2300024: Spike6
+    2300026: Spike7
+    2300028: Spike8
+    2300030: Spike9
+    3300000: CatHead
+    3300002: CatLeaves
+    3300004: CatLeftEar
+    3300006: CatLeftEye
+    3300008: CatNose
+    3300010: CatRightEar
+    3300012: CatRightEye
+    3300014: Spike1
+    3300016: Spike2
+    3300018: Spike3
+    3300020: Spike4
+    3300022: Spike5
+    3300024: Spike6
+    3300026: Spike7
+    3300028: Spike8
+    3300030: Spike9
+    4300000: CatStem
+    4300002: CatLeaves
+    4300004: CatHead
+    4300006: CatLeftEye
+    4300008: CatNose
+    4300010: CatRightEye
+    4300012: CatLeftEar
+    4300014: CatRightEar
+    4300016: Spike1
+    4300018: Spike2
+    4300020: Spike3
+    4300022: Spike4
+    4300024: Spike5
+    4300026: Spike6
+    4300028: Spike7
+    4300030: Spike8
+    4300032: Spike9
+    7400000: Idle
+    7400002: Attack
+    9500000: //RootNode
+    13700000: CatStem
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 0
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Idle
+      takeName: Take 001
+      firstFrame: 0
+      lastFrame: 40
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 1
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Bone001
+        weight: 1
+      - path: Bone001/Bone002
+        weight: 1
+      - path: Bone001/Bone002/Bone003
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/CatHead
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/CatHead/CatLeftEar
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/CatHead/CatLeftEye
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/CatHead/CatNose
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/CatHead/CatRightEar
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/CatHead/CatRightEye
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/Spike1
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/Spike2
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/Spike3
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/Spike4
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/Spike5
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/Spike6
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/Spike7
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/Spike8
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/Spike9
+        weight: 1
+      - path: CatStem
+        weight: 1
+      - path: CatStem/CatLeaves
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Attack
+      takeName: Take 001
+      firstFrame: 40
+      lastFrame: 70
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Bone001
+        weight: 1
+      - path: Bone001/Bone002
+        weight: 1
+      - path: Bone001/Bone002/Bone003
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/CatHead
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/CatHead/CatLeftEar
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/CatHead/CatLeftEye
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/CatHead/CatNose
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/CatHead/CatRightEar
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/CatHead/CatRightEye
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/Spike1
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/Spike2
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/Spike3
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/Spike4
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/Spike5
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/Spike6
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/Spike7
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/Spike8
+        weight: 1
+      - path: Bone001/Bone002/Bone003/Bone004/Bone005/Spike9
+        weight: 1
+      - path: CatStem
+        weight: 1
+      - path: CatStem/CatLeaves
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
