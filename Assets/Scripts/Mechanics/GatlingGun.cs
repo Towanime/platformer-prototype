@@ -90,24 +90,13 @@ public class GatlingGun : MonoBehaviour {
         return false;
     }
 
-    private float getAimingAngle()
-    {
-        float horizontalInput = playerInput.horizontalDirection;
-        float verticalInput = playerInput.verticalDirection;
-        // If its grounded don't aim down
-        tmp.y = (characterMovement.IsGrounded) ? Mathf.Max(verticalInput, 0) : verticalInput;
-        // If no horizontal direction is being held and Y is Up or Down then use the facing direction
-        tmp.x = (horizontalInput == 0 && tmp.y != 0) ? 0 : characterMovement.FacingDirection;
-        return Mathf.Atan2(tmp.y, tmp.x) * Mathf.Rad2Deg;
-    }
-
     private Vector2 GetBulletSpawnPosition()
     {
         Vector2 spawnPosition = emitor.transform.position;
         // Randomize position of the bullet by a position offset;
         float randomOffset = Random.Range(-bulletSpawnPositionRandomOffset, bulletSpawnPositionRandomOffset);
         // Add offset but first convert it to the angle of the spawn point
-        float angle = getAimingAngle();
+        float angle = characterMovement.GetAimingAngle();
         float cos = Mathf.Cos(angle * Mathf.Deg2Rad);
         float sin = Mathf.Sin(angle * Mathf.Deg2Rad);
         float tx = 0;
@@ -121,7 +110,7 @@ public class GatlingGun : MonoBehaviour {
     private Vector2 GetBulletDirection()
     {
         // Randomize direction of the bullet by an offset;
-        float angle = getAimingAngle();
+        float angle = characterMovement.GetAimingAngle();
         angle += Random.Range(-bulletAngleRandomOffset, bulletAngleRandomOffset);
         tmp.x = Mathf.Cos(angle * Mathf.Deg2Rad);
         tmp.y = Mathf.Sin(angle * Mathf.Deg2Rad);
