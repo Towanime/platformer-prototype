@@ -4,9 +4,6 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class GatlingGun : MonoBehaviour {
-    public CharacterMovement characterMovement;
-    public PlayerInput playerInput;
-    public Animator animator;
     [Tooltip("Object from where the bullets will spawn. Recomended an empty object with no collisions.")]
     public GameObject emitor;
     [Tooltip("Offset in degrees used to randomize the direction of the bullet. Ex: if the bullet is going right and the value is 5, the angle will be randomized in a range of -5 to 5.")]
@@ -34,12 +31,7 @@ public class GatlingGun : MonoBehaviour {
     private bool isFiringGun = false;
     private bool lastFiringGun = false;
     private bool isOverheated;
-    private Vector2 tmp;    
-
-    void Start()
-    {
-        playerInput = GetComponent<PlayerInput>();
-    }
+    private Vector2 tmp;
 
     void FixedUpdate()
     {
@@ -61,25 +53,21 @@ public class GatlingGun : MonoBehaviour {
         UpdateLabel();
         lastFiringGun = isFiringGun;
         isFiringGun = false;
-        if (animator != null)
-        {
-            animator.SetBool("IsShooting", lastFiringGun);
-        }
     }
 
     /// <summary>
     /// Fires a bullet
     /// </summary>
-    public bool Fire()
+    public bool Fire(float aimingAngle)
     {
         if (!isEnabled || isOverheated) return false;
         isFiringGun = true;
         if (!wait)
         {
             GameObject bullet = BulletPool.instance.GetObject();
-            bullet.transform.position = GetBulletSpawnPosition();
+            bullet.transform.position = GetBulletSpawnPosition(aimingAngle);
             Bullet component = bullet.GetComponent<Bullet>();
-            component.SetDirection(GetBulletDirection());
+            component.SetDirection(GetBulletDirection(aimingAngle));
             if (overrideBulletSpeed)
             {
                 component.speed = bulletSpeed;
@@ -93,15 +81,14 @@ public class GatlingGun : MonoBehaviour {
         return false;
     }
 
-    private Vector2 GetBulletSpawnPosition()
+    private Vector2 GetBulletSpawnPosition(float aimingAngle)
     {
         Vector2 spawnPosition = emitor.transform.position;
         // Randomize position of the bullet by a position offset;
         float randomOffset = Random.Range(-bulletSpawnPositionRandomOffset, bulletSpawnPositionRandomOffset);
         // Add offset but first convert it to the angle of the spawn point
-        float angle = characterMovement.GetAimingAngle();
-        float cos = Mathf.Cos(angle * Mathf.Deg2Rad);
-        float sin = Mathf.Sin(angle * Mathf.Deg2Rad);
+        float cos = Mathf.Cos(aimingAngle * Mathf.Deg2Rad);
+        float sin = Mathf.Sin(aimingAngle * Mathf.Deg2Rad);
         float tx = 0;
         float ty = randomOffset;
         tmp.x = cos * tx - sin * ty;
@@ -110,10 +97,10 @@ public class GatlingGun : MonoBehaviour {
         return spawnPosition;
     }
 
-    private Vector2 GetBulletDirection()
+    private Vector2 GetBulletDirection(float aimingAngle)
     {
         // Randomize direction of the bullet by an offset;
-        float angle = characterMovement.GetAimingAngle();
+        float angle = aimingAngle;
         angle += Random.Range(-bulletAngleRandomOffset, bulletAngleRandomOffset);
         tmp.x = Mathf.Cos(angle * Mathf.Deg2Rad);
         tmp.y = Mathf.Sin(angle * Mathf.Deg2Rad);

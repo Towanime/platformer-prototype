@@ -3,23 +3,15 @@ using System.Collections;
 
 public class SimplePlayerController : MonoBehaviour {
     public PlayerInput playerInput;
-    public CharacterMovement characterMovement;
-    public Animator animator;
     public bool isEnabled = true;
-    private GroundCheck groundCheck;
-    // skills
-    private Grab grabSkill;
-    private GatlingGun gatlingGun;
-    private Teleport teleport;
-
-    // Use this for initialization
-    void Start()
-    {
-        groundCheck = GetComponent<GroundCheck>();
-        grabSkill = GetComponent<Grab>();
-        gatlingGun = GetComponent<GatlingGun>();
-        teleport = GetComponentInChildren<Teleport>();
-    }
+    public GroundCheck groundCheck;
+    public AimingDirectionResolver aimingDirectionResolver;
+    private Vector2 tmp;
+    // Mechanics
+    public CharacterMovement characterMovement;
+    public Grab grabSkill;
+    public GatlingGun gatlingGun;
+    public Teleport teleport;
 
     void Update()
     {
@@ -82,12 +74,8 @@ public class SimplePlayerController : MonoBehaviour {
         
         if (playerInput.shooting)
         {
-            gatlingGun.Fire();
-           // animator.SetBool("IsShooting", gatlingGun.Fire());
-        }
-        else
-        {
-           // animator.SetBool("IsShooting", false);
+            bool grounded = groundCheck.IsGrounded;
+            gatlingGun.Fire(aimingDirectionResolver.GetAimingAngle(grounded));
         }
     }
 

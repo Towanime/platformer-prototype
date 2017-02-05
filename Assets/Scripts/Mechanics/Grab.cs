@@ -30,7 +30,7 @@ public class Grab : MonoBehaviour
     // starting throw time
     private float startTime;
     private float journeyLength;
-    private SimplePlayerController controller;
+    public SimplePlayerController controller;
     // grabbed enemy
     private GameObject grabbedEnemy;
     // cooldown vars
@@ -38,11 +38,6 @@ public class Grab : MonoBehaviour
     private bool wait;
     // true when the arm is going and coming back
     private bool isRunning;
-
-    // Use this for initialization
-    void Start () {
-        controller = GetComponent<SimplePlayerController>();
-	}
 
     void Update()
     {
