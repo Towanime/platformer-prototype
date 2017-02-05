@@ -7,6 +7,7 @@ public class CharacterMovement : MonoBehaviour {
     public bool freezeMovement = false;
     public Animator animator;
     private CharacterController characterController;
+    private GroundCheck groundCheck;
     private Vector2 tmpVector2 = Vector2.zero;
     private Vector3 tmpVector3 = Vector3.zero;
 
@@ -97,6 +98,7 @@ public class CharacterMovement : MonoBehaviour {
     void Start()
     {
         characterController = GetComponent<CharacterController>();
+        groundCheck = GetComponent<GroundCheck>();
         originalRotation = transform.localRotation;
     }
     
@@ -110,7 +112,7 @@ public class CharacterMovement : MonoBehaviour {
         {
             currentInputDirection = horizontalInput;
         }
-        grounded = IsGroundedInternal();
+        grounded = groundCheck.IsGrounded;
         UpdateSpeed(grounded, horizontalInput, currentInputDirection);
         if (freezeMovement)
         {
@@ -126,35 +128,35 @@ public class CharacterMovement : MonoBehaviour {
         facingDirection = currentInputDirection;
     }
 
-    private bool IsGroundedInternal()
-    {
-        return characterController.isGrounded;
-    }
-
     private float GetHorizontalInput()
     {
         // Either -1, 0 or 1
         return (processInput) ? playerInput.horizontalDirection : 0;
     }
 
-    public void Jump()
+    public bool Jump(bool canJumpInAir)
     {
-        bool canJump = grounded || timeInTheAir <= jumpCallTolerance;
+        bool canJump = canJumpInAir || groundCheck.IsGrounded || timeInTheAir <= jumpCallTolerance;
         if (processInput && canJump)
         {
             cutJumpShort = false;
             characterJustJumped = true;
+            return true;
         }
+        return false;
     }
 
     void Update()
     {
-        grounded = IsGroundedInternal();
-        animator.SetBool("IsJumping", !grounded);
+        grounded = groundCheck.IsGrounded;
         // Do jump detection in Update() loop because its less likely to miss inputs than FixedUpdate()
         timeInTheAir = (grounded) ? 0 : timeInTheAir + Time.deltaTime;
-        // Update aiming
-        animator.SetInteger("AimDirection", GetAimingDirectionValue());
+        // Update animator
+        if (animator != null)
+        {
+            animator.SetBool("IsJumping", !grounded);
+            animator.SetInteger("AimDirection", GetAimingDirectionValue());
+        }
     }
 
     /// <summary>
@@ -168,7 +170,7 @@ public class CharacterMovement : MonoBehaviour {
         float horizontalInput = playerInput.horizontalDirection;
         float verticalInput = playerInput.verticalDirection;
         // If its grounded don't aim down
-        float y = (IsGrounded) ? Mathf.Max(verticalInput, 0) : verticalInput;
+        float y = (grounded) ? Mathf.Max(verticalInput, 0) : verticalInput;
         // If no horizontal direction is being held and Y is Up or Down then use the facing direction
         float x = (horizontalInput == 0 && tmpVector2.y != 0) ? 0 : FacingDirection;
         tmpVector2.Set(x, y);
@@ -226,7 +228,10 @@ public class CharacterMovement : MonoBehaviour {
     {
         bool pressingDirection = horizontalInput != 0;
         bool moving = currentHorizontalSpeed != 0;
-        animator.SetBool("IsRunning", moving);
+        if (animator != null)
+        {
+            animator.SetBool("IsRunning", moving);
+        }
         if (moving && !pressingDirection)
         {
             float friction = (grounded) ? groundFriction : airFriction;
@@ -298,8 +303,11 @@ public class CharacterMovement : MonoBehaviour {
 
     private void UpdatePosition()
     {
-        tmpVector2.Set(currentHorizontalSpeed, currentVerticalSpeed);
-        characterController.Move(tmpVector2);
+        if (!freezeMovement)
+        {
+            tmpVector2.Set(currentHorizontalSpeed, currentVerticalSpeed);
+            characterController.Move(tmpVector2);
+        }
     }
 
     private void UpdateRotation(float currentInputDirection)
@@ -334,11 +342,6 @@ public class CharacterMovement : MonoBehaviour {
                 rotating = false;
             }
         }
-    }
-
-    public bool IsGrounded
-    {
-        get { return grounded; }
     }
 
     public float FacingDirection
