@@ -12,13 +12,16 @@ public class Grab : MonoBehaviour
     // time before being able to grab again
     public float grabCooldown = 0.1f;
     // arm needs a rigid body and colission
-    [Tooltip("Arm on the model, need a rigid body, collission and be on the Grab layer.")]
+    [Tooltip("Extra arm game object, need a rigid body, collission and be on the Grab layer.")]
     public GameObject arm;
     // empty object inside the player where the arm should always return
     [Tooltip("Empty object inside the player where the arm should always return.")]
     public GameObject armAnchor;
     // empty object used to keep the target relative to the player in case it moves
+    [Tooltip("Empty object inside the player used for calculations but it'll be likely removed later!.")]
     public GameObject armTarget;
+    [Tooltip("Renderer of the rooted arm in the model, it'll be disabled when doing a grab")]
+    public Renderer originalArmRenderer;
     public bool isEnabled = true;
     // 
     // did the player press the grab button?
@@ -31,6 +34,8 @@ public class Grab : MonoBehaviour
     private float startTime;
     private float journeyLength;
     private SimplePlayerController controller;
+    private CharacterMovement characterMovement;
+    private Animator animator;
     // grabbed enemy
     private GameObject grabbedEnemy;
     // cooldown vars
@@ -38,10 +43,14 @@ public class Grab : MonoBehaviour
     private bool wait;
     // true when the arm is going and coming back
     private bool isRunning;
+    // animation ended?
+    private bool animationEnded;
 
     // Use this for initialization
     void Start () {
         controller = GetComponent<SimplePlayerController>();
+        characterMovement = GetComponent<CharacterMovement>();
+        animator = GetComponent<Animator>();
 	}
 
     void Update()
@@ -91,11 +100,26 @@ public class Grab : MonoBehaviour
         }
 	}
 
-    public bool Begin(int direction)
+    public bool Begin()
     {
         if (!CanAct()) return false;
+        // dont do anything until the transition is complete
+        if (!animationEnded)
+        {
+            // init the state change
+            animator.SetBool("IsGrabbing", true);
+        }        
+        return true;
+    }
+    
+    /// <summary>
+    /// What to do after the animation transition is done and the arm should start traveling.
+    /// </summary>
+    public void Throw()
+    {
         // beging arm thow
         thrown = true;
+        animationEnded = true;
         grabbedEnemy = null;
         returnPenalty = 0;
         // bool so other components know when it's working
@@ -103,17 +127,25 @@ public class Grab : MonoBehaviour
         // data to lerp it in the update
         startTime = Time.time;
 
+        // enable throw arm and hide the animated one
+        originalArmRenderer.enabled = false;
+        arm.SetActive(true);
+
         // setup target for the arm
         Vector3 targetPosition = armAnchor.transform.position;
-        targetPosition.x += distance * direction;
+        targetPosition.x += distance * characterMovement.FacingDirection;
         armTarget.transform.position = targetPosition;
-        
+
         // enable grab trigger!
         arm.GetComponent<Collider>().enabled = true;
         Debug.Log("Begin thrown at: " + armAnchor.transform.position.ToString() + " - with limit: " + targetPosition.ToString());
-        return true;
     }
 
+
+    /// <summary>
+    /// What it does when the arm comes back to the player.
+    /// </summary>
+    /// <param name="penalty"></param>
     private void Comeback(bool penalty)
     {
         // start returning with delay
@@ -129,11 +161,15 @@ public class Grab : MonoBehaviour
         // clean up and renable the controller
         thrown = false;
         returning = false;
+        animationEnded = false;
         startTime = 0;
         controller.IsEnabled = true;
         // begin cooldown
         wait = true;
         currentCooldown = 0;
+        animator.SetBool("IsGrabbing", false);
+        arm.SetActive(false);
+        originalArmRenderer.enabled = true;
     }
 
     /// <summary>
@@ -157,7 +193,7 @@ public class Grab : MonoBehaviour
     /// <returns></returns>
     public bool CanAct()
     {
-        return currentCooldown >= grabCooldown || !wait;
+        return !isRunning && currentCooldown >= grabCooldown || !wait;
     }
 
     public void OnCollision(Collider collision)
