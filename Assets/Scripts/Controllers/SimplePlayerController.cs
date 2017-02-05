@@ -5,6 +5,7 @@ public class SimplePlayerController : MonoBehaviour {
     public PlayerInput playerInput;
     public CharacterMovement characterMovement;
     public bool isEnabled = true;
+    private GroundCheck groundCheck;
     // skills
     private Grab grabSkill;
     private GatlingGun gatlingGun;
@@ -13,6 +14,7 @@ public class SimplePlayerController : MonoBehaviour {
     // Use this for initialization
     void Start()
     {
+        groundCheck = GetComponent<GroundCheck>();
         grabSkill = GetComponent<Grab>();
         gatlingGun = GetComponent<GatlingGun>();
         teleport = GetComponentInChildren<Teleport>();
@@ -37,31 +39,47 @@ public class SimplePlayerController : MonoBehaviour {
                 IsEnabled = !grabSkill.Begin((int)characterMovement.LastInputDirection);
             }
         }
-        // Jump only if not firing the gun and not using the grab skill
-        if (playerInput.jumped && !grabSkill.IsRunning && !gatlingGun.IsFiringGun)
+        bool jumped = false;
+        bool grounded = groundCheck.IsGrounded;
+        if (playerInput.jumped && CanJump())
         {
-            characterMovement.Jump();
+            bool canJumpInAir = teleport.IsFloating;
+            jumped = characterMovement.Jump(canJumpInAir);
         }
-        // Freeze movement if the player is in the air while firing the gun or using the grab skill
-        if (teleport.IsTeleporting || (!characterMovement.IsGrounded && (gatlingGun.IsFiringGun || grabSkill.IsRunning)))
+        if (teleport.IsFloating && IsStopFloating(grounded, jumped))
         {
-            characterMovement.freezeMovement = true;
-        } else
-        {
-            characterMovement.freezeMovement = false;
+            teleport.IsFloating = false;
         }
+        characterMovement.freezeMovement = IsMovementFrozen(grounded);
         if (playerInput.teleported && teleport.HasTarget)
         {
             teleport.DoTeleport();
         }
     }
 
-    //FixedUpdate is called at a fixed interval and is independent of frame rate. Put physics code here.
+    private bool CanJump()
+    {
+        // Can jump if the player is not running, shooting or teleporting
+        return !grabSkill.IsRunning && !gatlingGun.IsFiringGun && !teleport.IsTeleporting;
+    }
+
+    private bool IsStopFloating(bool grounded, bool jumped)
+    {
+        // Float stops if the player is on the ground, shooting, grabbing or has jumped
+        return grounded || gatlingGun.IsFiringGun || grabSkill.IsRunning || jumped;
+    }
+
+    private bool IsMovementFrozen(bool grounded)
+    {
+        // Movement is frozen if the player is teleporting, floating, or is in the air while shooting or grabbing
+        return teleport.IsTeleporting || teleport.IsFloating || (!grounded && (gatlingGun.IsFiringGun || grabSkill.IsRunning));
+    }
+
     void FixedUpdate()
     {
         if (!isEnabled) return;
         
-        if (playerInput.shooting) // shooting and throwing
+        if (playerInput.shooting)
         {
             gatlingGun.Fire();
         }

@@ -4,50 +4,82 @@ using UnityEngine;
 
 public class Teleport : MonoBehaviour {
 
-    public float teleportSpeed = 3f;
+    [Tooltip("Area that contains the souls nearby.")]
+    public TeleportTriggerArea teleportTriggerArea;
+    [Tooltip("Object with the same dimentions as the player that is used to readjust the position of the teleport.")]
+    public GameObject teleportDummy;
+    [Tooltip("How fast the player teleports.")]
+    public float teleportSpeed = 15f;
+    [Tooltip("Time in seconds that the player will stay floating after the teleport ends.")]
+    public float floatingTime = 2f;
+
     private bool teleporting;
-    private Vector3 toPosition;
-    private List<GameObject> souls = new List<GameObject>();
+    private bool floating;
+    private float currentTimeFloating = 0;
+    private bool dummyEnabled;
     private CharacterMovement characterMovement;
-    private CharacterController characterController;
-    private Vector3 lastPosition;
+    private Vector3 tmp;
 
     void Start()
     {
         characterMovement = GetComponentInParent<CharacterMovement>();
-        characterController = GetComponentInParent<CharacterController>();
     }
 
     void FixedUpdate()
     {
-        if (!teleporting) return;
+        if (teleporting)
+        {
+            UpdateTeleport();
+        }
+        if (floating)
+        {
+            if (currentTimeFloating >= floatingTime)
+            {
+                floating = false;
+            }
+            currentTimeFloating += Time.fixedDeltaTime;
+        }
+    }
+
+    private void UpdateTeleport()
+    {
+        if (dummyEnabled)
+        {
+            // Disable immediately so that it doesn't collide with anything
+            DisableDummy();
+            dummyEnabled = false;
+        }
+        // Step by step move player torwards teleport destination
         float step = teleportSpeed * Time.fixedDeltaTime;
-        Vector3 currentPosition = transform.parent.position;
-        if (lastPosition == currentPosition)
+        Vector3 currentPosition = transform.position;
+        Vector3 toPosition = teleportDummy.transform.position;
+        Vector3 nextPosition = Vector3.MoveTowards(currentPosition, toPosition, step);
+        transform.position = nextPosition;
+        if (nextPosition == toPosition)
         {
             teleporting = false;
+            // Once the teleport is finished, let the player float for some time
+            floating = true;
+            currentTimeFloating = 0;
         }
-        else
-        {
-            Vector3 nextPosition = Vector3.MoveTowards(currentPosition, toPosition, step);
-            characterController.Move(nextPosition - currentPosition);
-        }
-        lastPosition = currentPosition;
     }
 
     public bool DoTeleport()
     {
+        // Automatically grab the soul that's closest to the player
         GameObject nearestSoul = null;
         Vector3 currentPosition = transform.position;
         float minDistance = 0;
+        List<GameObject> souls = teleportTriggerArea.Souls;
         for (int i = 0; i<souls.Count; i++)
         {
             GameObject soulObject = souls[i];
             Vector3 soulPosition = soulObject.transform.position;
             float xDiff = soulPosition.x - currentPosition.x;
-            bool soulAhead = xDiff == 0 || Mathf.Sign(xDiff) == characterMovement.LastInputDirection;
+            bool playerIsFacingSoul = xDiff == 0 || Mathf.Sign(xDiff) == characterMovement.LastInputDirection;
             float distance = Vector2.Distance(currentPosition, soulPosition);
-            if (soulAhead && (i == 0 || distance < minDistance))
+            // Only if the player is facing the soul
+            if (playerIsFacingSoul && (nearestSoul == null || distance < minDistance))
             {
                 nearestSoul = soulObject;
                 minDistance = distance;
@@ -56,14 +88,36 @@ public class Teleport : MonoBehaviour {
         if (nearestSoul != null)
         {
             teleporting = true;
-            toPosition = nearestSoul.transform.position;
+            // Set the dummy to the position of the soul so that we can use 
+            // the position after the collision adjustements have been done
+            UpdateDummyPosition(nearestSoul.transform.position);
         }
         return teleporting;
     }
 
+    private void UpdateDummyPosition(Vector3 position)
+    {
+        teleportDummy.SetActive(true);
+        teleportDummy.transform.position = position;
+        // Move dummy into every direction to resolve collisions and let it readjust position if neccesary
+        CharacterController characterController = teleportDummy.GetComponent<CharacterController>();
+        tmp.Set(-0.0001f, -0.0001f, -0.0001f);
+        characterController.Move(tmp);
+        tmp.Set(0.0002f, 0.0002f, 0.0002f);
+        characterController.Move(tmp);
+        tmp.Set(-0.0001f, -0.0001f, -0.0001f);
+        characterController.Move(tmp);
+        dummyEnabled = true;
+    }
+
+    private void DisableDummy()
+    {
+        teleportDummy.SetActive(false);
+    }
+
     public bool HasTarget
     {
-        get { return souls.Count > 0; }
+        get { return teleportTriggerArea.Souls.Count > 0; }
     }
 
     public bool IsTeleporting
@@ -71,24 +125,9 @@ public class Teleport : MonoBehaviour {
         get { return teleporting; }
     }
 
-    void OnTriggerEnter(Collider other)
+    public bool IsFloating
     {
-        if (other.CompareTag("Soul Drop"))
-        {
-            souls.Add(other.gameObject);
-        }
-    }
-
-    void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Soul Drop"))
-        {
-            souls.Remove(other.gameObject);
-        }
-    }
-
-    public void RemoveSoul(GameObject soul)
-    {
-        souls.Remove(soul);
+        get { return floating; }
+        set { floating = value; }
     }
 }

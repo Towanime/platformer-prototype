@@ -6,6 +6,7 @@ public class CharacterMovement : MonoBehaviour {
     public bool processInput = true;
     public bool freezeMovement = false;
     private CharacterController characterController;
+    private GroundCheck groundCheck;
     private Vector2 tmpVector2 = Vector2.zero;
     private Vector3 tmpVector3 = Vector3.zero;
 
@@ -96,6 +97,7 @@ public class CharacterMovement : MonoBehaviour {
     void Start()
     {
         characterController = GetComponent<CharacterController>();
+        groundCheck = GetComponent<GroundCheck>();
         originalRotation = transform.localRotation;
     }
     
@@ -109,7 +111,7 @@ public class CharacterMovement : MonoBehaviour {
         {
             currentInputDirection = horizontalInput;
         }
-        grounded = IsGroundedInternal();
+        grounded = groundCheck.IsGrounded;
         UpdateSpeed(grounded, horizontalInput, currentInputDirection);
         if (freezeMovement)
         {
@@ -125,32 +127,28 @@ public class CharacterMovement : MonoBehaviour {
         lastInputDirection = currentInputDirection;
     }
 
-    private bool IsGroundedInternal()
-    {
-        return characterController.isGrounded;
-    }
-
     private float GetHorizontalInput()
     {
         // Either -1, 0 or 1
         return (processInput) ? playerInput.direction : 0;
     }
 
-    public void Jump()
+    public bool Jump(bool canJumpInAir)
     {
-        bool canJump = grounded || timeInTheAir <= jumpCallTolerance;
+        bool canJump = canJumpInAir || groundCheck.IsGrounded || timeInTheAir <= jumpCallTolerance;
         if (processInput && canJump)
         {
             cutJumpShort = false;
             characterJustJumped = true;
+            return true;
         }
+        return false;
     }
 
     void Update()
     {
-        grounded = IsGroundedInternal();
         // Do jump detection in Update() loop because its less likely to miss inputs than FixedUpdate()
-        timeInTheAir = (grounded) ? 0 : timeInTheAir + Time.deltaTime;
+        timeInTheAir = (groundCheck.IsGrounded) ? 0 : timeInTheAir + Time.deltaTime;
     }
 
     private void UpdateSpeed(bool grounded, float horizontalInput, float currentInputDirection)
@@ -273,11 +271,6 @@ public class CharacterMovement : MonoBehaviour {
                 rotating = false;
             }
         }
-    }
-
-    public bool IsGrounded
-    {
-        get { return grounded; }
     }
 
     public float LastInputDirection

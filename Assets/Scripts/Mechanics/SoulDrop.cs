@@ -38,6 +38,10 @@ public class SoulDrop : MonoBehaviour {
 
     void Destroy()
     {
+        // Remove soul from teleport area if needed
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        TeleportTriggerArea teleportTriggerArea = player.GetComponentInChildren<TeleportTriggerArea>();
+        teleportTriggerArea.RemoveSoulFromArea(gameObject);
         // trigger spawn if any!
         if (spawnPoint)
         {
