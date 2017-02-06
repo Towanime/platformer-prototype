@@ -59,11 +59,6 @@ public class SimplePlayerController : MonoBehaviour {
         if (playerInput.shooting) // shooting and throwing
         {
             gatlingGun.Fire();
-           // animator.SetBool("IsShooting", gatlingGun.Fire());
-        }
-        else
-        {
-           // animator.SetBool("IsShooting", false);
         }
     }
 

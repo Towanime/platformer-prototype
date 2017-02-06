@@ -34,7 +34,7 @@ public class GatlingGun : MonoBehaviour {
     private bool isFiringGun = false;
     private bool lastFiringGun = false;
     private bool isOverheated;
-    private Vector2 tmp;    
+    private Vector2 tmp;
 
     void Start()
     {

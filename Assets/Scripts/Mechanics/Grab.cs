@@ -36,6 +36,8 @@ public class Grab : MonoBehaviour
     private SimplePlayerController controller;
     private CharacterMovement characterMovement;
     private Animator animator;
+    // renderer for the hidden arm
+    private Renderer armRenderer;
     // grabbed enemy
     private GameObject grabbedEnemy;
     // cooldown vars
@@ -51,6 +53,7 @@ public class Grab : MonoBehaviour
         controller = GetComponent<SimplePlayerController>();
         characterMovement = GetComponent<CharacterMovement>();
         animator = GetComponent<Animator>();
+        armRenderer = arm.GetComponent<Renderer>();
 	}
 
     void Update()
@@ -102,12 +105,14 @@ public class Grab : MonoBehaviour
 
     public bool Begin()
     {
-        if (!CanAct()) return false;
+        if (!CanAct() || !isEnabled) return false;
         // dont do anything until the transition is complete
         if (!animationEnded)
         {
             // init the state change
             animator.SetBool("IsGrabbing", true);
+            // bool so other components know when it's working
+            isRunning = true;
         }        
         return true;
     }
@@ -122,14 +127,12 @@ public class Grab : MonoBehaviour
         animationEnded = true;
         grabbedEnemy = null;
         returnPenalty = 0;
-        // bool so other components know when it's working
-        isRunning = true;
         // data to lerp it in the update
         startTime = Time.time;
 
         // enable throw arm and hide the animated one
         originalArmRenderer.enabled = false;
-        arm.SetActive(true);
+        armRenderer.enabled = true;
 
         // setup target for the arm
         Vector3 targetPosition = armAnchor.transform.position;
@@ -168,7 +171,7 @@ public class Grab : MonoBehaviour
         wait = true;
         currentCooldown = 0;
         animator.SetBool("IsGrabbing", false);
-        arm.SetActive(false);
+        armRenderer.enabled = false;
         originalArmRenderer.enabled = true;
     }
 
@@ -214,7 +217,7 @@ public class Grab : MonoBehaviour
             objectRigidBody.isKinematic = true;
             // change position of the grabbed object
             target.transform.position = armAnchor.transform.position;
-            target.transform.localPosition = new Vector3(1.5f, 0.5f, 0);
+            target.transform.localPosition = new Vector3(0.5f, 0, 0.5f);
             // store the grabbed enemy
             grabbedEnemy = target;
             // comeback with the target witout penalty
