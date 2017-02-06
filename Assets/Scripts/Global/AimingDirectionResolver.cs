@@ -10,8 +10,8 @@ public class AimingDirectionResolver : MonoBehaviour {
 
     /// <summary>
     /// Returns a Vector2 with the direction the player is aiming at depending on the input
-    /// X: -1 = Left, 0 = Middle (Only if Y != 0), 1 = Right
-    /// Y: -1 = Down, 0 = Forward, 1 = Up
+    /// X: Less than 0 = Left, 0 = Middle (Only if Y != 0), Bigger than 0 = Right
+    /// Y: Less than 0 = Down, 0 = Forward, Bigger than 0 = Up
     /// If the player is grounded then the down directions are replaced for forward.
     /// </summary>
     public Vector2 GetAimingDirection(bool grounded)
@@ -21,9 +21,9 @@ public class AimingDirectionResolver : MonoBehaviour {
         // If its grounded don't aim down
         float y = (grounded) ? Mathf.Max(verticalInput, 0) : verticalInput;
         // If no horizontal direction is being held and Y is Up or Down then use the facing direction
-        float x = (horizontalInput == 0 && tmp.y != 0) ? 0 : characterMovement.FacingDirection;
+        float x = (horizontalInput == 0 && y != 0) ? 0 : characterMovement.FacingDirection;
         tmp.Set(x, y);
-        return tmp;
+        return tmp.normalized;
     }
 
     /// <summary>

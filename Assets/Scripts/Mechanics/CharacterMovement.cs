@@ -158,7 +158,7 @@ public class CharacterMovement : MonoBehaviour {
 
     private void UpdateHorizontalSpeed(bool grounded, float horizontalInput, float currentInputDirection)
     {
-        bool pressingDirection = horizontalInput != 0;
+        bool pressingDirection = horizontalInput != 0 && !playerInput.lockAim;
         bool moving = currentHorizontalSpeed != 0;
         if (moving && !pressingDirection)
         {
@@ -235,6 +235,10 @@ public class CharacterMovement : MonoBehaviour {
         {
             tmpVector2.Set(currentHorizontalSpeed, currentVerticalSpeed);
             characterController.Move(tmpVector2);
+        } else
+        {
+            currentHorizontalSpeed = 0;
+            currentVerticalSpeed = 0;
         }
     }
 

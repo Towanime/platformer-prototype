@@ -6,7 +6,10 @@ public class SimplePlayerController : MonoBehaviour {
     public bool isEnabled = true;
     public GroundCheck groundCheck;
     public AimingDirectionResolver aimingDirectionResolver;
-    private Vector2 tmp;
+    [Tooltip("Delay after an enemy is thrown for when the player can begin shooting.")]
+    public float throwEnemyDelay = 0.2f;
+    private float throwEnemyTimer;
+    private bool isInThrowEnemyDelay;
     // Mechanics
     public CharacterMovement characterMovement;
     public Grab grabSkill;
@@ -17,6 +20,16 @@ public class SimplePlayerController : MonoBehaviour {
     {
         if (!isEnabled) return;
 
+        HandleGrab();
+        bool grounded = groundCheck.IsGrounded;
+        HandleThrow(grounded);
+        bool jumped = HandleJump();
+        HandleTeleport(grounded, jumped);
+        characterMovement.freezeMovement = IsMovementFrozen(grounded);
+    }
+
+    private void HandleGrab()
+    {
         // Detect grab
         if (playerInput.grabbed && grabSkill.CanAct())
         {
@@ -32,21 +45,61 @@ public class SimplePlayerController : MonoBehaviour {
                 IsEnabled = !grabSkill.Begin((int)characterMovement.FacingDirection);
             }
         }
+    }
+
+    private bool HandleJump()
+    {
         bool jumped = false;
-        bool grounded = groundCheck.IsGrounded;
         if (playerInput.jumped && CanJump())
         {
             bool canJumpInAir = teleport.IsFloating;
             jumped = characterMovement.Jump(canJumpInAir);
         }
+        return jumped;
+    }
+
+    private void HandleTeleport(bool grounded, bool jumped)
+    {
         if (teleport.IsFloating && IsStopFloating(grounded, jumped))
         {
             teleport.IsFloating = false;
         }
-        characterMovement.freezeMovement = IsMovementFrozen(grounded);
         if (playerInput.teleported && teleport.HasTarget)
         {
             teleport.DoTeleport();
+        }
+    }
+
+    private void HandleShooting()
+    {
+        if (playerInput.shooting && CanShoot())
+        {
+            bool grounded = groundCheck.IsGrounded;
+            float aimingAngle = aimingDirectionResolver.GetAimingAngle(grounded);
+            gatlingGun.Fire(aimingAngle);
+        }
+    }
+
+    private void HandleThrow(bool grounded)
+    {
+        if (isInThrowEnemyDelay)
+        {
+            throwEnemyTimer += Time.deltaTime;
+            if (throwEnemyTimer >= throwEnemyDelay)
+            {
+                isInThrowEnemyDelay = false;
+            }
+        }
+        if (playerInput.threw && CanThrowEnemy())
+        {
+            Vector2 aimingDirection = aimingDirectionResolver.GetAimingDirection(grounded);
+            // If the throw happened start a timer so that the character has to wait before shooting again
+            bool threwEnemy = grabSkill.ThrowEnemy(aimingDirection);
+            if (threwEnemy)
+            {
+                throwEnemyTimer = 0;
+                isInThrowEnemyDelay = true;
+            }
         }
     }
 
@@ -54,6 +107,16 @@ public class SimplePlayerController : MonoBehaviour {
     {
         // Can jump if the player is not running, shooting or teleporting
         return !grabSkill.IsRunning && !gatlingGun.IsFiringGun && !teleport.IsTeleporting;
+    }
+
+    private bool CanThrowEnemy()
+    {
+        return grabSkill.IsHolding;
+    }
+
+    private bool CanShoot()
+    {
+        return !grabSkill.IsHolding && !isInThrowEnemyDelay;
     }
 
     private bool IsStopFloating(bool grounded, bool jumped)
@@ -71,12 +134,8 @@ public class SimplePlayerController : MonoBehaviour {
     void FixedUpdate()
     {
         if (!isEnabled) return;
-        
-        if (playerInput.shooting)
-        {
-            bool grounded = groundCheck.IsGrounded;
-            gatlingGun.Fire(aimingDirectionResolver.GetAimingAngle(grounded));
-        }
+
+        HandleShooting();
     }
 
     public bool IsEnabled

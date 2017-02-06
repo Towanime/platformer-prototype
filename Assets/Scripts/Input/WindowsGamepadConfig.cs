@@ -7,5 +7,6 @@ public class WindowsGamepadConfig : MonoBehaviour
     public KeyCode grab;
     public KeyCode shot;
     public KeyCode teleport;
+    public KeyCode lockAim;
     public bool useStickForMovement;
 }

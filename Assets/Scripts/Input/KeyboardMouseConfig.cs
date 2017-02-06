@@ -11,4 +11,5 @@ public class KeyboardMouseConfig : MonoBehaviour
     public KeyCode grab;
     public KeyCode shot;
     public KeyCode teleport;
+    public KeyCode lockAim;
 }

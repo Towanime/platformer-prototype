@@ -86,4 +86,10 @@ public class DamageableEntity : MonoBehaviour {
             currentLife = value;
         }
     }
+
+    public bool DropSoul
+    {
+        get { return dropSoul; }
+        set { dropSoul = value; }
+    }
 }

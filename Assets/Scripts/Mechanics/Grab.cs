@@ -6,11 +6,17 @@ public class Grab : MonoBehaviour
     [Tooltip("Units from initial point to max distance.")]
     public float distance = 3;
     [Tooltip("Speed for the arm.")]
-    public float speed = 8f;
+    public float speed = 12f;
     public float speedPenalty = 1.5f;
     [Tooltip("Cooldown before attepting another grab or crunch.")]
     // time before being able to grab again
     public float grabCooldown = 0.1f;
+    [Tooltip("Force applied when throwing an enemy.")]
+    public float throwSpeed = 12f;
+    [Tooltip("Time that the enemy will spend in the air after being thrown and before dissapearing.")]
+    public float throwEnemyTravelTime = 2f;
+    [Tooltip("Speed curve of the enemy throw.")]
+    public AnimationCurve throwSpeedCurve;
     // arm needs a rigid body and colission
     [Tooltip("Arm on the model, need a rigid body, collission and be on the Grab layer.")]
     public GameObject arm;
@@ -141,6 +147,20 @@ public class Grab : MonoBehaviour
         grabbedEnemy.SendMessage("OnDeath");
         // destroy object
         Destroy(grabbedEnemy);
+        grabbedEnemy = null;
+        End();
+        return true;
+    }
+
+    /// <summary>
+    /// Throws an enemy in the direction that the player is aiming at
+    /// </summary>
+    public bool ThrowEnemy(Vector2 aimingDirection)
+    {
+        if (grabbedEnemy == null) return false;
+        GrababbleEntity grababbleEntity = grabbedEnemy.GetComponent<GrababbleEntity>();
+        grababbleEntity.BeginThrow(aimingDirection, throwSpeed, throwEnemyTravelTime, throwSpeedCurve);
+        grabbedEnemy.transform.parent = null;
         grabbedEnemy = null;
         End();
         return true;
