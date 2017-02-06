@@ -21,7 +21,7 @@ public class GrabAnimationHandler : StateMachineBehaviour
         {
             finished = true;
             // get the grab component for the player and start the throw
-            GameObject.Find("Dark Lord").GetComponent<Grab>().Throw();
+            animator.gameObject.GetComponent<Grab>().Throw();
         }
     }
 

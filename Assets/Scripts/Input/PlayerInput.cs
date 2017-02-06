@@ -11,6 +11,8 @@ public class PlayerInput : MonoBehaviour {
     public bool jumped;
     public bool shooting;
     public bool teleported;
+    public bool threw;
+    public bool lockAim;
 
     void Update()
     {
@@ -18,6 +20,8 @@ public class PlayerInput : MonoBehaviour {
         this.SetJump();
         this.SetGrab();
         this.SetShoot();
+        this.SetThrow();
+        this.SetLockAim();
     }
 
     void SetDirection()
@@ -54,8 +58,18 @@ public class PlayerInput : MonoBehaviour {
         grabbed = Input.GetKeyDown(this.keyboardMouseConfig.grab) || Input.GetKeyDown(this.windowsGamepadConfig.grab);
     }
 
+    void SetThrow()
+    {
+        threw = Input.GetKeyDown(this.keyboardMouseConfig.shot) || Input.GetKeyDown(this.windowsGamepadConfig.shot);
+    }
+
     void SetShoot()
     {
         shooting = Input.GetKey(this.keyboardMouseConfig.shot) || Input.GetKey(this.windowsGamepadConfig.shot);
+    }
+
+    void SetLockAim()
+    {
+        lockAim = Input.GetKey(this.keyboardMouseConfig.lockAim) || Input.GetKey(this.windowsGamepadConfig.lockAim);
     }
 }

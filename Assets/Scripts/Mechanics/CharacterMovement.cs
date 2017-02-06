@@ -5,9 +5,8 @@ public class CharacterMovement : MonoBehaviour {
     public PlayerInput playerInput;
     public bool processInput = true;
     public bool freezeMovement = false;
-    public Animator animator;
-    private CharacterController characterController;
-    private GroundCheck groundCheck;
+    public CharacterController characterController;
+    public GroundCheck groundCheck;
     private Vector2 tmpVector2 = Vector2.zero;
     private Vector3 tmpVector3 = Vector3.zero;
 
@@ -97,8 +96,6 @@ public class CharacterMovement : MonoBehaviour {
 
     void Start()
     {
-        characterController = GetComponent<CharacterController>();
-        groundCheck = GetComponent<GroundCheck>();
         originalRotation = transform.localRotation;
     }
     
@@ -151,71 +148,6 @@ public class CharacterMovement : MonoBehaviour {
         grounded = groundCheck.IsGrounded;
         // Do jump detection in Update() loop because its less likely to miss inputs than FixedUpdate()
         timeInTheAir = (grounded) ? 0 : timeInTheAir + Time.deltaTime;
-        // Update animator
-        if (animator != null)
-        {
-            animator.SetBool("IsJumping", !grounded);
-            animator.SetInteger("AimDirection", GetAimingDirectionValue());
-        }
-    }
-
-    /// <summary>
-    /// Returns a Vector2 with the direction the player is aiming at depending on the input
-    /// X: -1 = Left, 0 = Middle (Only if Y != 0), 1 = Right
-    /// Y: -1 = Down, 0 = Forward, 1 = Up
-    /// If the player is grounded then the down directions are replaced for forward.
-    /// </summary>
-    public Vector2 GetAimingDirection()
-    {
-        float horizontalInput = playerInput.horizontalDirection;
-        float verticalInput = playerInput.verticalDirection;
-        // If its grounded don't aim down
-        float y = (grounded) ? Mathf.Max(verticalInput, 0) : verticalInput;
-        // If no horizontal direction is being held and Y is Up or Down then use the facing direction
-        float x = (horizontalInput == 0 && tmpVector2.y != 0) ? 0 : FacingDirection;
-        tmpVector2.Set(x, y);
-        return tmpVector2;
-    }
-
-    /// <summary>
-    /// Returns an int representing one of the constants in the AimingDirection class 
-    /// with the direction the player is aiming at. 
-    /// It returns the same values no matter if the character is facing left or right.
-    /// If the player is grounded then the down directions are replaced for forward.
-    /// </summary>
-    public int GetAimingDirectionValue()
-    {
-        Vector2 aimingDirection = GetAimingDirection();
-        float x = aimingDirection.x;
-        float y = aimingDirection.y;
-        int aimingDirectionEnum = AimingDirection.Forward;
-        if (x == 0 && y > 0)
-        {
-            aimingDirectionEnum = AimingDirection.Up;
-        }
-        else if (x != 0 && y > 0)
-        {
-            aimingDirectionEnum = AimingDirection.UpDiagonal;
-        }
-        else if (x != 0 && y < 0)
-        {
-            aimingDirectionEnum = AimingDirection.DownDiagonal;
-        }
-        else if (x == 0 && y < 0)
-        {
-            aimingDirectionEnum = AimingDirection.Down;
-        }
-        return aimingDirectionEnum;
-    }
-
-    /// <summary>
-    /// Returns a float representing the aiming direction in degrees
-    /// If the player is grounded then the down directions are replaced for forward.
-    /// </summary>
-    public float GetAimingAngle()
-    {
-        Vector2 aimingDirection = GetAimingDirection();
-        return Mathf.Atan2(aimingDirection.y, aimingDirection.x) * Mathf.Rad2Deg;
     }
 
     private void UpdateSpeed(bool grounded, float horizontalInput, float currentInputDirection)
@@ -226,12 +158,8 @@ public class CharacterMovement : MonoBehaviour {
 
     private void UpdateHorizontalSpeed(bool grounded, float horizontalInput, float currentInputDirection)
     {
-        bool pressingDirection = horizontalInput != 0;
+        bool pressingDirection = horizontalInput != 0 && !playerInput.lockAim;
         bool moving = currentHorizontalSpeed != 0;
-        if (animator != null)
-        {
-            animator.SetBool("IsRunning", moving);
-        }
         if (moving && !pressingDirection)
         {
             float friction = (grounded) ? groundFriction : airFriction;
@@ -307,6 +235,10 @@ public class CharacterMovement : MonoBehaviour {
         {
             tmpVector2.Set(currentHorizontalSpeed, currentVerticalSpeed);
             characterController.Move(tmpVector2);
+        } else
+        {
+            currentHorizontalSpeed = 0;
+            currentVerticalSpeed = 0;
         }
     }
 
@@ -347,5 +279,10 @@ public class CharacterMovement : MonoBehaviour {
     public float FacingDirection
     {
         get { return facingDirection; }
+    }
+
+    public bool IsMoving
+    {
+        get { return currentHorizontalSpeed != 0; }
     }
 }

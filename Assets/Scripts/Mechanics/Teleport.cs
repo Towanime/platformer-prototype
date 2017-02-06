@@ -12,18 +12,13 @@ public class Teleport : MonoBehaviour {
     public float teleportSpeed = 15f;
     [Tooltip("Time in seconds that the player will stay floating after the teleport ends.")]
     public float floatingTime = 2f;
+    public CharacterMovement characterMovement;
 
     private bool teleporting;
     private bool floating;
     private float currentTimeFloating = 0;
     private bool dummyEnabled;
-    private CharacterMovement characterMovement;
     private Vector3 tmp;
-
-    void Start()
-    {
-        characterMovement = GetComponentInParent<CharacterMovement>();
-    }
 
     void FixedUpdate()
     {
