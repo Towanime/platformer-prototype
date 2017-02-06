@@ -61,7 +61,10 @@ public class GatlingGun : MonoBehaviour {
         UpdateLabel();
         lastFiringGun = isFiringGun;
         isFiringGun = false;
-        animator.SetBool("IsShooting", lastFiringGun);
+        if (animator != null)
+        {
+            animator.SetBool("IsShooting", lastFiringGun);
+        }
     }
 
     /// <summary>

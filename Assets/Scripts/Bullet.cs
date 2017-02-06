@@ -39,6 +39,8 @@ public class Bullet : MonoBehaviour
     // bullet hit something, do damage and destroy!
     public void OnTriggerEnter(Collider other)
     {
+        // temporal
+        if (other.transform.IsChildOf(GameObject.FindGameObjectWithTag("Player").transform)) return;
         // maybe do othe checks here later
         // check if the object is damagable
         DamageableEntity entity = other.gameObject.GetComponent<DamageableEntity>();

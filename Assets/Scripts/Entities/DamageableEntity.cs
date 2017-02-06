@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class DamageableEntity : MonoBehaviour {
-    public bool doDamage;
     public bool ignoreDamage = false;
     public float life;
     public GameObject spawnPoint;
@@ -13,17 +12,17 @@ public class DamageableEntity : MonoBehaviour {
 
     void Start()
     {
+        Refresh();
         InitSpawnPoint();
     }
 
     void Update()
     {
-        // to test spawn
-        if (doDamage)
-        {
-            OnDamage(10);
-            doDamage = false;
-        }
+    }
+
+    public virtual void Initialize()
+    {
+
     }
 
     public virtual void OnDamage(float damage)
