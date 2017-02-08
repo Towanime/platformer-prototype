@@ -20,11 +20,13 @@ public class CharacterMovement : MonoBehaviour {
     /// </summary>
     [Tooltip("Used when moving in one direction while pressing the other")]
     public float reactivityPercent = 0.5f;
+    [Tooltip("Used when moving in one direction while pressing the other")]
+    public FlipingMethod flipingMethod = FlipingMethod.Mirror;
     /// <summary>
     /// How much time the rotation will take until the character 
     /// faces the same direction that is being pressed
     /// </summary>
-    [Tooltip("How much time the rotation will take until the character faces the same direction that is being pressed")]
+    [Tooltip("How much time the rotation will take until the character faces the same direction that is being pressed. Only used if flip method is \"Rotation\"")]
     public float timeToFlipFacingDirection = 0.2f;
     private float currentHorizontalSpeed = 0f;
     /// <summary>
@@ -41,6 +43,7 @@ public class CharacterMovement : MonoBehaviour {
     private Quaternion fromRotation;
     private Quaternion toRotation;
     private Quaternion originalRotation;
+    private Vector3 originalScale;
     private float currentRotationTime = 0f;
     /// <summary>
     /// True if the character's rotation is being adjusted to 
@@ -94,8 +97,15 @@ public class CharacterMovement : MonoBehaviour {
     private bool cutJumpShort = false;
     private bool characterJustJumped;
 
+    public enum FlipingMethod
+    {
+        Mirror,
+        Rotation
+    }
+
     void Start()
     {
+        originalScale = transform.localScale;
         originalRotation = transform.localRotation;
     }
     
@@ -248,20 +258,28 @@ public class CharacterMovement : MonoBehaviour {
         // Start a new rotation only if the direction input has changed
         if (currentInputDirection != facingDirection)
         {
-            // First calculate the currentRotationTime instead of setting it 
-            // straight to 0 in case the character was already rotating when 
-            // the controller changed direction.
-            float delta = (forward.z + 1) / 2;
-            if (currentInputDirection < 0)
+            if (flipingMethod == FlipingMethod.Rotation)
             {
-                delta = 1 - delta;
+                // First calculate the currentRotationTime instead of setting it 
+                // straight to 0 in case the character was already rotating when 
+                // the controller changed direction.
+                float delta = (forward.z + 1) / 2;
+                if (currentInputDirection < 0)
+                {
+                    delta = 1 - delta;
+                }
+                currentRotationTime = timeToFlipFacingDirection * delta;
+                rotating = true;
+                tmpVector3.Set(0, 0, -currentInputDirection);
+                fromRotation = Quaternion.LookRotation(tmpVector3);
+                tmpVector3.Set(0, 0, currentInputDirection);
+                toRotation = Quaternion.LookRotation(tmpVector3);
+            } else if (flipingMethod == FlipingMethod.Mirror)
+            {
+                // For horizontal mirroring just change the sign of the Z value in the scale
+                tmpVector3.Set(originalScale.x, originalScale.y, originalScale.z * currentInputDirection);
+                transform.localScale = tmpVector3;
             }
-            currentRotationTime = timeToFlipFacingDirection * delta;
-            rotating = true;
-            tmpVector3.Set(0, 0, -currentInputDirection);
-            fromRotation = Quaternion.LookRotation(tmpVector3);
-            tmpVector3.Set(0, 0, currentInputDirection);
-            toRotation = Quaternion.LookRotation(tmpVector3);
         }
         if (rotating)
         {
