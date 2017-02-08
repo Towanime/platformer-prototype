@@ -33,6 +33,7 @@ public class CatHead : DamageableEntity
         // create drop soul and place
         GameObject soulObject = SoulPool.instance.GetObject();
         soulDrop = soulObject.GetComponent<SoulDrop>();
+        soulDrop.Initialize(null);
         // set on top of the cat
         Vector3 position = transform.position;
         position.y += soulDropDistance;
