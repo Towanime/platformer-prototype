@@ -45,7 +45,7 @@ public class SpawnPoint : MonoBehaviour {
         GameObject enemy = Instantiate(enemyPrefab, transform.position, Quaternion.identity) as GameObject;
         enemy.transform.position = transform.position;
         // setup spawn point
-        DamageableEntity entity = enemy.GetComponent<DamageableEntity>();
+        EnemyDamageableEntity entity = enemy.GetComponent<EnemyDamageableEntity>();
         entity.SetSpawnPoint(gameObject);
     }
 }

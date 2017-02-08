@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CatHead : DamageableEntity
+public class CatHead : EnemyDamageableEntity
 {
     [Tooltip("Distance on the Y axis where the soul drop will appear.")]
     public float soulDropDistance;

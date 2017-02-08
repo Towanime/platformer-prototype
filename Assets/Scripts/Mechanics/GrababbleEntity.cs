@@ -46,7 +46,7 @@ public class GrababbleEntity : MonoBehaviour {
     private void FinishThrow()
     {
         beingThrown = false;
-        DamageableEntity damageableEntity = gameObject.GetComponent<DamageableEntity>();
+        EnemyDamageableEntity damageableEntity = gameObject.GetComponent<EnemyDamageableEntity>();
         if (damageableEntity != null)
         {
             damageableEntity.DropSoul = false;
