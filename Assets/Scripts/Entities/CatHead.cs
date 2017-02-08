@@ -10,6 +10,7 @@ public class CatHead : DamageableEntity
     public float spawnTime;
     //
     public Collider headCollider;
+    public Animator animator;
     private float currentSpawnTime;
     private bool waiting;
     private SoulDrop soulDrop;
@@ -29,6 +30,7 @@ public class CatHead : DamageableEntity
 
     protected override void OnDeath()
     {
+        animator.SetBool("IsDead", true);
         // override with cat behavior
         // create drop soul and place
         GameObject soulObject = SoulPool.instance.GetObject();
@@ -39,7 +41,7 @@ public class CatHead : DamageableEntity
         position.y += soulDropDistance;
         soulObject.transform.position = position;
         // activate soul drop and disable cat head
-        ShowRenderer(false);
+        //ShowRenderer(false);
         // subscribe to soul event
         soulDrop.SoulDestroyedEvent += OnSoulDestroy;
 
@@ -54,6 +56,8 @@ public class CatHead : DamageableEntity
         currentSpawnTime = 0;
         Refresh();
         waiting = false;
+        animator.SetTrigger("Respawn");
+        animator.SetBool("IsDead", false);
     }
 
     protected void ShowRenderer(bool show)
@@ -69,7 +73,6 @@ public class CatHead : DamageableEntity
 
     private void OnSoulDestroy(GameObject sender, bool playerCollected)
     {
-        Debug.Log("Reused with event?!");
         // start the spawn counter
         waiting = true;
         // unsubscribe event!
