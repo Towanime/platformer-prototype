@@ -90,7 +90,14 @@ public class CharacterMovement : MonoBehaviour {
     /// </summary>
     [Tooltip("Time given for a character to still be able to jump after it has fallen of a ledge.")]
     public float jumpCallTolerance = 0.2f;
+    /// <summary>
+    /// If it's currently grounded.
+    /// </summary>
     private bool grounded;
+    /// <summary>
+    /// If it was grounded in the last frame.
+    /// </summary>
+    private bool wasGrounded;
     private float currentVerticalSpeed = 0f;
     private float timeInTheAir = 0f;
     private float timeSinceJumpStarted = 0f;
@@ -203,18 +210,14 @@ public class CharacterMovement : MonoBehaviour {
 
     private void UpdateVerticalSpeed(bool grounded)
     {
-        float gravityValue = -gravity * Time.fixedDeltaTime;
-        if (grounded)
-        {
-            // Always reset vertical speed on ground
-            currentVerticalSpeed = 0;
-        }
-        else if (currentVerticalSpeed > 0)
-        {
-            // Lower the gravity value if the character is ascending after a jump
-            gravityValue = gravityValue * gravityAscensionModifier;
-        }
-        currentVerticalSpeed += gravityValue;
+        ApplyGravity();
+        ProcessJumpInput();
+        ClampVerticalSpeed();
+        wasGrounded = grounded;
+    }
+
+    private void ProcessJumpInput()
+    {
         // Cut the jump the moment the player stops holding the button
         if (!processInput || !playerInput.holdingJump)
         {
@@ -227,6 +230,10 @@ public class CharacterMovement : MonoBehaviour {
             characterJustJumped = false;
             grounded = false;
         }
+    }
+
+    private void ClampVerticalSpeed()
+    {
         if (!grounded)
         {
             // If cutting the jump, lower the vertical speed
@@ -237,6 +244,25 @@ public class CharacterMovement : MonoBehaviour {
             timeSinceJumpStarted += Time.fixedDeltaTime;
         }
         currentVerticalSpeed = Mathf.Max(currentVerticalSpeed, -maxFallingSpeed);
+    }
+
+    private void ApplyGravity()
+    {
+        float gravityValue = -gravity * Time.fixedDeltaTime;
+        if (!grounded)
+        {
+            if (wasGrounded && currentVerticalSpeed < 0)
+            {
+                // Reset vertical speed the moment the player stops touching the ground (if it's not jumping)
+                currentVerticalSpeed = 0;
+            }
+            else if (currentVerticalSpeed >= 0)
+            {
+                // Lower the gravity value if the character is ascending after a jump
+                gravityValue = gravityValue * gravityAscensionModifier;
+            }
+        }
+        currentVerticalSpeed += gravityValue;
     }
 
     private void UpdatePosition()
