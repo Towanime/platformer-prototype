@@ -240,7 +240,7 @@ public class Grab : MonoBehaviour
             objectRigidBody.isKinematic = true;
             // change position of the grabbed object
             target.transform.position = armAnchor.transform.position;
-            target.transform.localPosition = new Vector3(0.5f, 0, 0.5f);
+            target.transform.localPosition = new Vector3(0.5f, 0, 0f);
             // store the grabbed enemy
             grabbedEnemy = target;
             // comeback with the target witout penalty
