@@ -326,6 +326,11 @@ public class CharacterMovement : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Adds an instant force in the X and Y axis.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
     public void AddForce(float x, float y)
     {
         currentHorizontalSpeed = x;

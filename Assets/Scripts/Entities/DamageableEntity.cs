@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Base class for entities that have a life and can take on damage.
+/// </summary>
 public class DamageableEntity : MonoBehaviour
 {
     public bool ignoreDamage = false;

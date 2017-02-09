@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Base class for enemies that can take damage and die, dropping souls and respawn.
+/// </summary>
 public class EnemyDamageableEntity : DamageableEntity {
 
     public GameObject spawnPoint;
@@ -12,10 +15,6 @@ public class EnemyDamageableEntity : DamageableEntity {
     {
         Refresh();
         InitSpawnPoint();
-    }
-
-    void Update()
-    {
     }
 
     public virtual void Initialize()
