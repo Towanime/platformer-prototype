@@ -4,62 +4,101 @@ using UnityEngine;
 
 public class PlayerLife : DamageableEntity {
 
-    public float invinsibilityTime;
+    public float timeInvinsible;
+    public float timeStunned;
     public float timePerFlick;
     public bool flickerEnabled;
-    public List<Renderer> renderersToFlick;
+    public List<Renderer> renderersForFlicker;
+    public float knockbackForceX;
+    public float knockbackForceY;
+    public CharacterMovement characterMovement;
     private bool rendering;
     private bool invinsible;
-    private float elapsedInvinsibilityTime;
+    private bool stunned;
+    private float elapsedTime;
     private float elapsedFickerTime;
 
-    public override bool OnDamage(float damage)
+    public override bool OnDamage(GameObject origin, float damage)
     {
         bool damaged = false;
-        if (!invinsible)
+        float damageToApply = 1; // Make it 1 always
+        if (!invinsible && !stunned)
         {
-            damaged = base.OnDamage(damage);
+            damaged = base.OnDamage(origin, damageToApply);
             if (damaged)
             {
-                invinsible = true;
-                if (flickerEnabled)
-                {
-                    rendering = false;
-                    elapsedFickerTime = 0;
-                }
-                elapsedInvinsibilityTime = 0;
+                stunned = true;
+                ApplyKnockback(origin);
+                elapsedTime = 0;
             }
         }
         return damaged;
     }
-	
-	// Update is called once per frame
+
+    private void ApplyKnockback(GameObject origin)
+    {
+        bool attackFromTheRight = origin.transform.position.x >= transform.position.x;
+        float knockbackXDirection = attackFromTheRight ? -1 : 1;
+        characterMovement.AddForce(knockbackForceX * knockbackXDirection, knockbackForceY);
+    }
+
 	void Update () {
-		if (invinsible)
+        if (stunned)
+        {
+            UpdateStunned();
+        } else if (invinsible)
         {
             if (flickerEnabled)
             {
-                foreach (Renderer renderer in renderersToFlick)
-                {
-                    renderer.enabled = rendering;
-                }
-                elapsedFickerTime += Time.deltaTime;
-                if (elapsedFickerTime >= timePerFlick)
-                {
-                    elapsedFickerTime = 0;
-                    rendering = !rendering;
-                }
+                UpdateFlicker();
             }
-            elapsedInvinsibilityTime += Time.deltaTime;
-            if (elapsedInvinsibilityTime >= invinsibilityTime)
-            {
-                invinsible = false;
-                foreach (Renderer renderer in renderersToFlick)
-                {
-                    renderer.enabled = true;
-                }
-            }
-
+            UpdateInvinsible();
         }
 	}
+
+    private void UpdateStunned()
+    {
+        elapsedTime += Time.deltaTime;
+        if (elapsedTime >= timeStunned)
+        {
+            invinsible = true;
+            stunned = false;
+            elapsedTime = 0;
+            rendering = false;
+            elapsedFickerTime = 0;
+            if (flickerEnabled)
+            {
+                EnableRendering(rendering);
+            }
+        }
+    }
+
+    private void UpdateInvinsible()
+    {
+        elapsedTime += Time.deltaTime;
+        if (elapsedTime >= timeInvinsible)
+        {
+            EnableRendering(true);
+            invinsible = false;
+        }
+    }
+
+    private void UpdateFlicker()
+    {
+        elapsedFickerTime += Time.deltaTime;
+        if (elapsedFickerTime >= timePerFlick)
+        {
+            elapsedFickerTime = 0;
+            rendering = !rendering;
+            EnableRendering(rendering);
+        }
+    }
+
+    private void EnableRendering(bool enabled)
+    {
+        foreach (Renderer renderer in renderersForFlicker)
+        {
+            renderer.enabled = enabled;
+        }
+    }
 }

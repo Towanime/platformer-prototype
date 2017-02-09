@@ -21,7 +21,7 @@ public class Hazard : MonoBehaviour {
             DamageableEntity entity = obj.GetComponent<DamageableEntity>();
             if (entity)
             {
-                entity.OnDamage(damage);
+                entity.OnDamage(gameObject, damage);
                 return true;
             }
         }

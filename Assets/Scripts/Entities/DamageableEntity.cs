@@ -13,7 +13,7 @@ public class DamageableEntity : MonoBehaviour
         currentLife = life;
     }
 
-    public virtual bool OnDamage(float damage)
+    public virtual bool OnDamage(GameObject origin, float damage)
     {
         if (ignoreDamage) return false;
         ModifyCurrentLife(damage);
