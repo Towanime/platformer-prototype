@@ -13,6 +13,7 @@ public class Teleport : MonoBehaviour {
     [Tooltip("Time in seconds that the player will stay floating after the teleport ends.")]
     public float floatingTime = 2f;
     public CharacterMovement characterMovement;
+    public Animator animator;
 
     private bool teleporting;
     private bool floating;
@@ -86,6 +87,7 @@ public class Teleport : MonoBehaviour {
             // Set the dummy to the position of the soul so that we can use 
             // the position after the collision adjustements have been done
             UpdateDummyPosition(nearestSoul.transform.position);
+            animator.SetTrigger("ShadowWalk");
         }
         return teleporting;
     }

@@ -114,7 +114,8 @@ public class Grab : MonoBehaviour
         {
             currentArtState = ArmState.WaitingAnimation;
             // init the state change
-            animator.SetBool("IsGrabbing", true);
+            animator.SetTrigger("ThrowArm");
+            //animator.SetBool("IsGrabbing", true);
         }        
         return true;
     }
@@ -130,7 +131,7 @@ public class Grab : MonoBehaviour
         grabbedEnemy = null;
         returnPenalty = 0;
         // data to lerp it in the update
-        startTime = Time.time;
+        startTime = Time.time; animator.SetBool("IsGrabbing", true);
 
         // enable throw arm and hide the animated one
         originalArmRenderer.enabled = false;
@@ -170,7 +171,7 @@ public class Grab : MonoBehaviour
         // begin cooldown
         waitCooldown = true;
         currentCooldown = 0;
-        animator.SetBool("IsGrabbing", false);
+        animator.SetBool("IsGrabbing", grabbedEnemy != null);
         armRenderer.enabled = false;
         originalArmRenderer.enabled = true;
     }
@@ -238,7 +239,7 @@ public class Grab : MonoBehaviour
 
             // change position of the grabbed object
             toAttach.transform.position = armAnchor.transform.position;
-            toAttach.transform.localPosition = new Vector3(0, 0, 0f);
+            toAttach.transform.localPosition = new Vector3(0, -1, 0.3f);
             // store the grabbed enemy
             grabbedEnemy = toAttach;
             // comeback with the target witout penalty
