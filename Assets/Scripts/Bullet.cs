@@ -2,18 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bullet : MonoBehaviour
+public class Bullet : Hazard
 {
-    public float damage;
     public float lifeSpan = 2;
     public float speed = 5;
-    private Vector2 direction; // 1 or -1
-
-    // Use this for initialization
-    void Start()
-    {
-
-    }
+    [Tooltip("Layers that will be ignored by the bullet's collision.")]
+    public LayerMask ignoreCollisionMask;
+    private Vector2 direction;
 
     // Update is called once per frame
     void Update()
@@ -39,16 +34,9 @@ public class Bullet : MonoBehaviour
     // bullet hit something, do damage and destroy!
     public void OnTriggerEnter(Collider other)
     {
-        // temporal
-        if (other.transform.IsChildOf(GameObject.FindGameObjectWithTag("Player").transform)) return;
-        // maybe do othe checks here later
-        // check if the object is damagable
-        DamageableEntity entity = other.gameObject.GetComponent<DamageableEntity>();
-        if (entity)
-        {
-            // do bullet damage
-            entity.OnDamage(damage);
-        }
+        // If the bullet hits something that it's supposed to be ignored, don't do anything
+        if (Util.IsObjectInLayerMask(ignoreCollisionMask, other.gameObject)) return;
+        DoDamage(other.gameObject);
         Destroy();
     }
 

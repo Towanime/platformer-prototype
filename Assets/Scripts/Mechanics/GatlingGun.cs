@@ -111,7 +111,7 @@ public class GatlingGun : MonoBehaviour {
 
     private void UpdateLabel()
     {
-        lblTemp.text = currentOverheat + "/" + overheatLimit;
+        lblTemp.text = "Overheat: " + currentOverheat.ToString("0.00") + "s / " + overheatLimit.ToString("0.00") + "s";
     }
 
     public bool IsOverheated

@@ -32,7 +32,7 @@ public class CharacterMovement : MonoBehaviour {
     /// <summary>
     /// Direction in which the character is moving (-1 = left, 1 = right).
     /// </summary>
-    private float movingDirection = 1f;
+    private float currentMovingDirection = 1f;
     /// <summary>
     /// Direction that the player was pressing in the last frame (-1 = left, 1 = right). 
     /// If the player is not pressing any direction then the last direction pressed is retained.
@@ -98,6 +98,7 @@ public class CharacterMovement : MonoBehaviour {
     /// If it was grounded in the last frame.
     /// </summary>
     private bool wasGrounded;
+    private bool jumped;
     private float currentVerticalSpeed = 0f;
     private float timeInTheAir = 0f;
     private float timeSinceJumpStarted = 0f;
@@ -117,7 +118,11 @@ public class CharacterMovement : MonoBehaviour {
     }
     
     void FixedUpdate()
-    {
+    {   
+        if (currentHorizontalSpeed != 0)
+        {
+            currentMovingDirection = Mathf.Sign(currentHorizontalSpeed);
+        }
         // Either -1, 0 or 1
         float horizontalInput = GetHorizontalInput();
         // Either -1 or 1, see lastInputDirection for details.
@@ -135,10 +140,6 @@ public class CharacterMovement : MonoBehaviour {
         }
         UpdatePosition();
         UpdateRotation(currentInputDirection);
-        if (currentHorizontalSpeed != 0)
-        {
-            movingDirection = Mathf.Sign(currentHorizontalSpeed);
-        }
         facingDirection = currentInputDirection;
     }
 
@@ -180,9 +181,9 @@ public class CharacterMovement : MonoBehaviour {
         if (moving && !pressingDirection)
         {
             float friction = (grounded) ? groundFriction : airFriction;
-            currentHorizontalSpeed = currentHorizontalSpeed + friction * Time.fixedDeltaTime * movingDirection * -1;
+            currentHorizontalSpeed = currentHorizontalSpeed + friction * Time.fixedDeltaTime * -currentMovingDirection;
             // If no direction is being pressed then clamp the speed to 0 once reached.
-            if (movingDirection > 0)
+            if (currentMovingDirection > 0)
             {
                 currentHorizontalSpeed = Mathf.Max(0, currentHorizontalSpeed);
             }
@@ -193,7 +194,7 @@ public class CharacterMovement : MonoBehaviour {
         }
         else if (pressingDirection)
         {
-            bool movingInSameDirectionBeingPressed = movingDirection == currentInputDirection;
+            bool movingInSameDirectionBeingPressed = currentMovingDirection == currentInputDirection;
             if (movingInSameDirectionBeingPressed)
             {
                 // Regular speed formula
@@ -223,18 +224,23 @@ public class CharacterMovement : MonoBehaviour {
         {
             cutJumpShort = true;
         }
+        if (grounded)
+        {
+            jumped = false;
+        }
         if (characterJustJumped)
         {
             currentVerticalSpeed = jumpImpulse;
             timeSinceJumpStarted = 0;
             characterJustJumped = false;
             grounded = false;
+            jumped = true;
         }
     }
 
     private void ClampVerticalSpeed()
     {
-        if (!grounded)
+        if (!grounded && jumped)
         {
             // If cutting the jump, lower the vertical speed
             if (cutJumpShort && timeSinceJumpStarted > minJumpTime)
@@ -318,6 +324,17 @@ public class CharacterMovement : MonoBehaviour {
                 rotating = false;
             }
         }
+    }
+
+    /// <summary>
+    /// Adds an instant force in the X and Y axis.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    public void AddForce(float x, float y)
+    {
+        currentHorizontalSpeed = x;
+        currentVerticalSpeed = y;
     }
 
     public float FacingDirection
