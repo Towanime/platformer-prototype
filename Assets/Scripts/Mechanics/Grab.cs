@@ -3,6 +3,8 @@ using System.Collections;
 
 public class Grab : MonoBehaviour
 {
+    private enum ArmState { Default, WaitingAnimation, Thrown, Returning };
+
     [Tooltip("Units from initial point to max distance.")]
     public float distance = 3;
     [Tooltip("Speed for the arm.")]
@@ -28,30 +30,24 @@ public class Grab : MonoBehaviour
     public GameObject armTarget;
     [Tooltip("Renderer of the rooted arm in the model, it'll be disabled when doing a grab")]
     public Renderer originalArmRenderer;
+    public SimplePlayerController controller;
+    public CharacterMovement characterMovement;
+    public Animator animator;
     public bool isEnabled = true;
-    // 
-    // did the player press the grab button?
-    private bool thrown;
-    // is the arm returning to the original position?
-    private bool returning;
+    // has been thrown? is it returning?
+    private ArmState currentArtState;
     // temporal penalty if theres no collision
     private float returnPenalty;
     // starting throw time
     private float startTime;
     private float journeyLength;
-
-    public SimplePlayerController controller;
-    public CharacterMovement characterMovement;
-    public Animator animator;
     // renderer for the hidden arm
     private Renderer armRenderer;
     // grabbed enemy
     private GameObject grabbedEnemy;
     // cooldown vars
     private float currentCooldown;
-    private bool wait;
-    // true when the arm is going and coming back
-    private bool isRunning;
+    private bool waitCooldown;
     // animation ended?
     private bool animationEnded;
 
@@ -63,48 +59,50 @@ public class Grab : MonoBehaviour
 
     void Update()
     {
-        if (wait)
+        if (waitCooldown)
         {
             currentCooldown += Time.deltaTime;
             // turn off wait if the time is up
             if (currentCooldown >= grabCooldown)
             {
-                wait = false;
+                waitCooldown = false;
             }
         }
     }
 	
 	void FixedUpdate () {
         if (!isEnabled) return;
-        // distance to traverse between player and target
-        journeyLength = Vector3.Distance(armAnchor.transform.position, armTarget.transform.position);
-        float distCovered = (Time.time - startTime) * (speed - returnPenalty);
-        float fracJourney = distCovered / journeyLength;
 
-        // check distance manually 
-        if (thrown)
-        {
-            // update position of the arm
-            arm.transform.position = Vector3.Lerp(armAnchor.transform.position, armTarget.transform.position, fracJourney);
+        // distance to traverse between player and target if the arm is being thrown or is returning
+        //if (currentArtState != ArmState.Default) {
+            journeyLength = Vector3.Distance(armAnchor.transform.position, armTarget.transform.position);
+            float distCovered = (Time.time - startTime) * (speed - returnPenalty);
+            float fracJourney = distCovered / journeyLength;
+        //}
 
-            // got to the target?
-            if(fracJourney >= 1)
-            {
-                Comeback(true);
-                Debug.Log("Arm reached max distance! At: " + arm.transform.position.ToString());
-            }
-        } else if (returning)
+        switch (currentArtState)
         {
-            arm.transform.position = Vector3.Lerp(armTarget.transform.position, armAnchor.transform.position, fracJourney);
-            // check destination
-            if (fracJourney >= 1)
-            {
-                // not traveling anymore
-                isRunning = false;
-                // finish grab
-                End();
-                Debug.Log("Arm returned empty handed! At: " + arm.transform.position.ToString());
-            }
+            case ArmState.Thrown:
+                // update position of the arm
+                arm.transform.position = Vector3.Lerp(armAnchor.transform.position, armTarget.transform.position, fracJourney);
+                // got to the target?
+                if (fracJourney >= 1)
+                {
+                    Comeback(true);
+                    Debug.Log("Arm reached max distance! At: " + arm.transform.position.ToString());
+                }
+                break;
+
+            case ArmState.Returning:
+                arm.transform.position = Vector3.Lerp(armTarget.transform.position, armAnchor.transform.position, fracJourney);
+                // check destination
+                if (fracJourney >= 1)
+                {
+                    // finish grab
+                    End();
+                    Debug.Log("Arm returned empty handed! At: " + arm.transform.position.ToString());
+                }
+                break;
         }
 	}
 
@@ -114,10 +112,9 @@ public class Grab : MonoBehaviour
         // dont do anything until the transition is complete
         if (!animationEnded)
         {
+            currentArtState = ArmState.WaitingAnimation;
             // init the state change
             animator.SetBool("IsGrabbing", true);
-            // bool so other components know when it's working
-            isRunning = true;
         }        
         return true;
     }
@@ -125,10 +122,10 @@ public class Grab : MonoBehaviour
     /// <summary>
     /// What to do after the animation transition is done and the arm should start traveling.
     /// </summary>
-    public void Throw()
+    public void ArmThrow()
     {
         // beging arm thow
-        thrown = true;
+        currentArtState = ArmState.Thrown;
         animationEnded = true;
         grabbedEnemy = null;
         returnPenalty = 0;
@@ -153,12 +150,11 @@ public class Grab : MonoBehaviour
     /// <summary>
     /// What it does when the arm comes back to the player.
     /// </summary>
-    /// <param name="penalty"></param>
+    /// <param name="penalty">Apply speed penalty if nothing was grabbed.</param>
     private void Comeback(bool penalty)
     {
         // start returning with delay
-        returning = true;
-        thrown = false;
+        currentArtState = ArmState.Returning;
         returnPenalty = penalty ? speedPenalty : 0;
         startTime = Time.time;
         arm.GetComponent<Collider>().enabled = false;
@@ -166,14 +162,13 @@ public class Grab : MonoBehaviour
 
     private void End()
     {
+        currentArtState = ArmState.Default;
         // clean up and renable the controller
-        thrown = false;
-        returning = false;
         animationEnded = false;
         startTime = 0;
         controller.IsEnabled = true;
         // begin cooldown
-        wait = true;
+        waitCooldown = true;
         currentCooldown = 0;
         animator.SetBool("IsGrabbing", false);
         armRenderer.enabled = false;
@@ -196,12 +191,12 @@ public class Grab : MonoBehaviour
     }
 
     /// <summary>
-    /// Throws an enemy in the direction that the player is aiming at
+    /// Throws an enemy in the direction that the player is aiming.
     /// </summary>
     public bool ThrowEnemy(Vector2 aimingDirection)
     {
         if (grabbedEnemy == null) return false;
-        GrababbleEntity grababbleEntity = grabbedEnemy.GetComponent<GrababbleEntity>();
+        ThrowBehavior grababbleEntity = grabbedEnemy.GetComponent<ThrowBehavior>();
         // Reset Z position to 0 before throwing?
         Vector3 position = grababbleEntity.transform.position;
         position.z = 0;
@@ -219,9 +214,13 @@ public class Grab : MonoBehaviour
     /// <returns></returns>
     public bool CanAct()
     {
-        return !isRunning && currentCooldown >= grabCooldown || !wait;
+        return currentArtState == ArmState.Default || !waitCooldown;
     }
 
+    /// <summary>
+    /// Used by the trigger on the arm to let the component know a collision has happened and should evaluate the grab.
+    /// </summary>
+    /// <param name="collision"></param>
     public void OnCollision(Collider collision)
     {
         // update arm target position to the contact point!
@@ -229,20 +228,19 @@ public class Grab : MonoBehaviour
 
         GameObject target = collision.gameObject;
 
-        GrababbleEntity canGrab = target.GetComponent<GrababbleEntity>();
-        // leave it done its grab behavior and attach the body if returns true
-        if (canGrab && canGrab.OnGrab())
+        GrabbableEntity entity = collision.gameObject.GetComponent<GrabbableEntity>();
+        GameObject toAttach;
+        // leave it done its grab behavior and attach the body if returns something
+        if (entity && (toAttach = entity.OnGrab()) != null)
         {
             // make it child of the arm anchor or arm object??
-            target.transform.parent = arm.transform;
+            toAttach.transform.parent = arm.transform;
 
-            Rigidbody objectRigidBody = target.GetComponent<Rigidbody>();
-            objectRigidBody.isKinematic = true;
             // change position of the grabbed object
-            target.transform.position = armAnchor.transform.position;
-            target.transform.localPosition = new Vector3(0.5f, 0, 0f);
+            toAttach.transform.position = armAnchor.transform.position;
+            toAttach.transform.localPosition = new Vector3(0, 0, 0f);
             // store the grabbed enemy
-            grabbedEnemy = target;
+            grabbedEnemy = toAttach;
             // comeback with the target witout penalty
             Comeback(false);
         }else
@@ -276,7 +274,7 @@ public class Grab : MonoBehaviour
     {
         get
         {
-            return this.isRunning;
+            return currentArtState != ArmState.Default;//this.isRunning;
         }
     }
 }

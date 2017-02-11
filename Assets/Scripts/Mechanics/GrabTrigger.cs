@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Trigger used in the arm to know when it hits a grababble entity or when returns to the original thrown point (player's body).
+/// Trigger attached in the arm to know when it hits a grababble entity. It notifies the grab component on the player.
 /// </summary>
 public class GrabTrigger : MonoBehaviour
 {

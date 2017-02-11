@@ -16,10 +16,10 @@ public class SoulDrop : MonoBehaviour {
     /// Subscribe to this to know when a souls dissapears by collection or time running out.
     /// </summary>
     public event SoulDestroyEventHandler SoulDestroyedEvent;
-    private SpawnPoint spawnPoint;
+    private ISpawnPoint spawnPoint;
     private bool wasCollected;
     
-    public void Initialize(SpawnPoint spawnPoint)
+    public void Initialize(ISpawnPoint spawnPoint)
     {
         this.spawnPoint = spawnPoint;
     }
@@ -59,7 +59,7 @@ public class SoulDrop : MonoBehaviour {
         TeleportTriggerArea teleportTriggerArea = player.GetComponentInChildren<TeleportTriggerArea>();
         teleportTriggerArea.RemoveSoulFromArea(gameObject);
         // trigger spawn if any!
-        if (spawnPoint)
+        if (spawnPoint != null)
         {
             spawnPoint.Spawn();
         }

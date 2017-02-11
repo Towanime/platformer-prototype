@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpawnPoint : MonoBehaviour {
+public class SpawnPoint : MonoBehaviour, ISpawnPoint {
     public GameObject enemyPrefab;
     public float spawnTime;
     public bool spawnOnAwake;
@@ -29,6 +29,10 @@ public class SpawnPoint : MonoBehaviour {
         }
 	}
 
+    /// <summary>
+    /// Will start the timer and other spawn conditions to check before creating the enemy on the level.
+    /// </summary>
+    /// <returns></returns>
     public bool Spawn()
     {
         if (waiting) return false;
@@ -40,12 +44,15 @@ public class SpawnPoint : MonoBehaviour {
         return true;
     }
 
+    /// <summary>
+    /// Implement enemy creation here, it is called after the timer is resolved.
+    /// </summary>
     private void CreateEnemy()
     {
         GameObject enemy = Instantiate(enemyPrefab, transform.position, Quaternion.identity) as GameObject;
         enemy.transform.position = transform.position;
         // setup spawn point
         EnemyDamageableEntity entity = enemy.GetComponent<EnemyDamageableEntity>();
-        entity.SetSpawnPoint(gameObject);
+        entity.spawn = this;
     }
 }

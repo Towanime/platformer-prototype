@@ -1,8 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CatHead : EnemyDamageableEntity
+public class Cat : EnemyDamageableEntity, ISpawnPoint
 {
     [Tooltip("Distance on the Y axis where the soul drop will appear.")]
     public float soulDropDistance;
@@ -11,6 +12,7 @@ public class CatHead : EnemyDamageableEntity
     //
     public Collider headCollider;
     public Animator animator;
+    private bool isAlive = true;
     private float currentSpawnTime;
     private bool waiting;
     private SoulDrop soulDrop;
@@ -23,13 +25,21 @@ public class CatHead : EnemyDamageableEntity
             // check if it's ready to create the enemy
             if (currentSpawnTime >= spawnTime)
             {
-                Spawn();
+                FinalizeSpawn();
             }
         }
     }
 
+    public void GrabKill()
+    {
+        isAlive = false;
+        animator.SetBool("IsDead", true);
+        headCollider.enabled = false;
+    }
+
     protected override void OnDeath()
     {
+        isAlive = false;
         animator.SetBool("IsDead", true);
         // override with cat behavior
         // create drop soul and place
@@ -41,7 +51,6 @@ public class CatHead : EnemyDamageableEntity
         position.y += soulDropDistance;
         soulObject.transform.position = position;
         // activate soul drop and disable cat head
-        //ShowRenderer(false);
         // subscribe to soul event
         soulDrop.SoulDestroyedEvent += OnSoulDestroy;
 
@@ -49,9 +58,9 @@ public class CatHead : EnemyDamageableEntity
         soulObject.SetActive(true);
     }
 
-    private void Spawn()
+    private void FinalizeSpawn()
     {
-        ShowRenderer(true);
+        isAlive = true;
         headCollider.enabled = true;
         currentSpawnTime = 0;
         Refresh();
@@ -60,22 +69,22 @@ public class CatHead : EnemyDamageableEntity
         animator.SetBool("IsDead", false);
     }
 
-    protected void ShowRenderer(bool show)
-    {
-        Renderer[] renderChildren = GetComponentsInChildren<Renderer>();
-
-        for (int i = 0; i < renderChildren.Length; ++i)
-        {
-            renderChildren[i].enabled = show;
-        }
-
-    }
-
     private void OnSoulDestroy(GameObject sender, bool playerCollected)
     {
         // start the spawn counter
         waiting = true;
         // unsubscribe event!
         soulDrop.SoulDestroyedEvent -= OnSoulDestroy;
+    }
+
+    public bool Spawn()
+    {
+        waiting = true;
+        return true;
+    }
+
+    public bool IsAlive
+    {
+        get { return this.isAlive; }
     }
 }

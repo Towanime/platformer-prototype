@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class GrababbleEntity : MonoBehaviour {
+/// <summary>
+/// Marks a game object as grabbable and returns a game object to attach to the player when the grab is successful.
+/// </summary>
+public class ThrowBehavior : MonoBehaviour {
 
     private bool beingThrown;
     private float elapsedTime;
@@ -9,15 +12,6 @@ public class GrababbleEntity : MonoBehaviour {
     private AnimationCurve throwSpeedCurve;
     private Vector2 throwDirection;
     private float throwSpeed;
-
-    /// <summary>
-    /// Checks conditions and prepares a body to be able attached to the arm.
-    /// </summary>
-    /// <returns>Returns true if the grab is successful or false if there's a condition to meet before grabbing an enemy.</returns>
-	public virtual bool OnGrab()
-    {
-        return !beingThrown;
-    }
 
     void FixedUpdate()
     {

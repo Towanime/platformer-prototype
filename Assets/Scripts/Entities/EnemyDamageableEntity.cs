@@ -7,9 +7,10 @@ using UnityEngine;
 /// </summary>
 public class EnemyDamageableEntity : DamageableEntity {
 
+    [Tooltip("Game object that has a component that implements the ISpawnPoint interface.")]
     public GameObject spawnPoint;
     public bool dropSoul;
-    protected SpawnPoint spawn;
+    public ISpawnPoint spawn;
 
     void Start()
     {
@@ -30,24 +31,24 @@ public class EnemyDamageableEntity : DamageableEntity {
             GameObject soul = SoulPool.instance.GetObject();
             soul.transform.position = transform.position;
             // set the spawn point if any
-            if (spawn)
+            if (spawn != null)
             {
                 SoulDrop soulDrop = soul.GetComponent<SoulDrop>();
                 soulDrop.Initialize(spawn);
             }
             soul.SetActive(true);
-        } else if (spawn) // check if it should respawn
+        } else if (spawn != null) // check if it should respawn
         {
             spawn.Spawn();
         }
         base.OnDeath();
     }
 
-    public void SetSpawnPoint(GameObject gameobject)
+    /*public void SetSpawnPoint(ISpawnPoint gameobject)
     {
         spawnPoint = gameobject;
         InitSpawnPoint();
-    }
+    }*/
 
     private void InitSpawnPoint()
     {
