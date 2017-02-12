@@ -98,7 +98,7 @@ public class CharacterMovement : MonoBehaviour {
     /// If it was grounded in the last frame.
     /// </summary>
     private bool wasGrounded;
-    private bool jumped;
+    private bool jumping;
     private float currentVerticalSpeed = 0f;
     private float timeInTheAir = 0f;
     private float timeSinceJumpStarted = 0f;
@@ -151,7 +151,7 @@ public class CharacterMovement : MonoBehaviour {
 
     public bool Jump(bool canJumpInAir)
     {
-        bool canJump = canJumpInAir || groundCheck.IsGrounded || timeInTheAir <= jumpCallTolerance;
+        bool canJump = canJumpInAir || (!jumping && (groundCheck.IsGrounded || timeInTheAir <= jumpCallTolerance));
         if (processInput && canJump)
         {
             cutJumpShort = false;
@@ -226,7 +226,7 @@ public class CharacterMovement : MonoBehaviour {
         }
         if (grounded)
         {
-            jumped = false;
+            jumping = false;
         }
         if (characterJustJumped)
         {
@@ -234,13 +234,13 @@ public class CharacterMovement : MonoBehaviour {
             timeSinceJumpStarted = 0;
             characterJustJumped = false;
             grounded = false;
-            jumped = true;
+            jumping = true;
         }
     }
 
     private void ClampVerticalSpeed()
     {
-        if (!grounded && jumped)
+        if (!grounded && jumping)
         {
             // If cutting the jump, lower the vertical speed
             if (cutJumpShort && timeSinceJumpStarted > minJumpTime)
