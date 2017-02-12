@@ -60,14 +60,13 @@ public class Teleport : MonoBehaviour {
         }
     }
 
-    public bool DoTeleport()
+    public GameObject GetNearestSoul()
     {
-        // Automatically grab the soul that's closest to the player
         GameObject nearestSoul = null;
         Vector3 currentPosition = transform.position;
         float minDistance = 0;
         List<GameObject> souls = teleportTriggerArea.Souls;
-        for (int i = 0; i<souls.Count; i++)
+        for (int i = 0; i < souls.Count; i++)
         {
             GameObject soulObject = souls[i];
             Vector3 soulPosition = soulObject.transform.position;
@@ -81,6 +80,13 @@ public class Teleport : MonoBehaviour {
                 minDistance = distance;
             }
         }
+        return nearestSoul;
+    }
+
+    public bool DoTeleport()
+    {
+        // Automatically grab the soul that's closest to the player
+        GameObject nearestSoul = GetNearestSoul();
         if (nearestSoul != null)
         {
             teleporting = true;
