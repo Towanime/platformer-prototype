@@ -9,6 +9,8 @@ public class KeyboardMouseConfig : MonoBehaviour
     public KeyCode down;
     public KeyCode jump;
     public KeyCode grab;
+    public KeyCode throwEnemy;
+    public KeyCode crush;
     public KeyCode shot;
     public KeyCode teleport;
     public KeyCode lockAim;

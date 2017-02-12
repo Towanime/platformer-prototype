@@ -12,6 +12,7 @@ public class PlayerInput : MonoBehaviour {
     public bool shooting;
     public bool teleported;
     public bool threw;
+    public bool crushed;
     public bool lockAim;
 
     void Update()
@@ -21,6 +22,7 @@ public class PlayerInput : MonoBehaviour {
         this.SetGrab();
         this.SetShoot();
         this.SetThrow();
+        this.SetCrush();
         this.SetLockAim();
     }
 
@@ -60,12 +62,17 @@ public class PlayerInput : MonoBehaviour {
 
     void SetThrow()
     {
-        threw = Input.GetKeyDown(this.keyboardMouseConfig.shot) || Input.GetKeyDown(this.windowsGamepadConfig.shot);
+        threw = Input.GetKeyDown(this.keyboardMouseConfig.throwEnemy) || Input.GetKeyDown(this.windowsGamepadConfig.throwEnemy);
     }
 
     void SetShoot()
     {
         shooting = Input.GetKey(this.keyboardMouseConfig.shot) || Input.GetKey(this.windowsGamepadConfig.shot);
+    }
+
+    void SetCrush()
+    {
+        crushed = Input.GetKey(this.keyboardMouseConfig.crush) || Input.GetKey(this.windowsGamepadConfig.crush);
     }
 
     void SetLockAim()
