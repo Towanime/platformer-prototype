@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Util : MonoBehaviour {
+public class Util {
 
     /// <summary>
     /// Checks if the layer of the given GameObject is included in the given layerMask.

@@ -7,6 +7,7 @@ using UnityEngine;
 /// </summary>
 public class GrabTrigger : MonoBehaviour
 {
+    public LayerMask layersToIgnore;
     private Grab grabComponent;
 
     void Start()
@@ -16,6 +17,7 @@ public class GrabTrigger : MonoBehaviour
     
     public void OnTriggerEnter(Collider other)
     {
+        if (Util.IsObjectInLayerMask(layersToIgnore, other.gameObject)) return;
         grabComponent.OnCollision(other);
     }
 
