@@ -21,6 +21,7 @@ public class SimplePlayerController : MonoBehaviour {
         if (!isEnabled) return;
 
         HandleGrab();
+        HandleCrush();
         bool grounded = groundCheck.IsGrounded;
         HandleThrow(grounded);
         bool jumped = HandleJump();
@@ -31,19 +32,21 @@ public class SimplePlayerController : MonoBehaviour {
     private void HandleGrab()
     {
         // Detect grab
-        if (playerInput.grabbed && grabSkill.CanAct())
+        if (playerInput.grabbed && grabSkill.CanAct() && !grabSkill.IsHolding)
         {
             // initiate grab and disable controller until is done
-            if (grabSkill.IsHolding)
-            {
-                // destroys object
-                grabSkill.Crush();
-            }
-            else
-            {
-                // if the grab initiates correctly then disable the controller!
-                IsEnabled = !grabSkill.Begin();
-            }
+            // if the grab initiates correctly then disable the controller!
+            IsEnabled = !grabSkill.Begin();
+        }
+    }
+
+    private void HandleCrush()
+    {
+        // Detect crush
+        if (playerInput.crushed && grabSkill.CanAct() && grabSkill.IsHolding)
+        {
+            // destroys object
+            grabSkill.Crush();
         }
     }
 
