@@ -18,7 +18,8 @@ public class GrabbableCat : GrabbableEntity
 
     public override GameObject OnGrab()
     {
-        if (hazardComponent.enabled)
+        AnimatorStateInfo animatorInfo = entity.animator.GetCurrentAnimatorStateInfo(0);
+        if (hazardComponent.enabled && (animatorInfo.IsName("Attack") && (animatorInfo.normalizedTime > 0.35f && animatorInfo.normalizedTime < 0.70f)))
         {
             // do damage
             return null;

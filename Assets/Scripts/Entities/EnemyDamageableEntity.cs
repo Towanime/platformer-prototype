@@ -44,12 +44,6 @@ public class EnemyDamageableEntity : DamageableEntity {
         base.OnDeath();
     }
 
-    /*public void SetSpawnPoint(ISpawnPoint gameobject)
-    {
-        spawnPoint = gameobject;
-        InitSpawnPoint();
-    }*/
-
     private void InitSpawnPoint()
     {
         if (!spawnPoint) return;

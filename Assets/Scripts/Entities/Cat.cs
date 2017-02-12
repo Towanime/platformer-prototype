@@ -16,6 +16,13 @@ public class Cat : EnemyDamageableEntity, ISpawnPoint
     private float currentSpawnTime;
     private bool waiting;
     private SoulDrop soulDrop;
+    private Hazard spawnHazard;
+
+    void Start()
+    {
+        Refresh();
+        spawnHazard = GetComponentInChildren<Hazard>();
+    }
 
     public void Update()
     {
@@ -33,13 +40,17 @@ public class Cat : EnemyDamageableEntity, ISpawnPoint
     public void GrabKill()
     {
         isAlive = false;
+        ignoreDamage = true;
         animator.SetBool("IsDead", true);
-        headCollider.enabled = false;
+        spawnHazard.enabled = true;
+        Debug.Log("Hazard? " +
+        spawnHazard.enabled);
     }
 
     protected override void OnDeath()
     {
         isAlive = false;
+        ignoreDamage = true;
         animator.SetBool("IsDead", true);
         // override with cat behavior
         // create drop soul and place
@@ -53,20 +64,20 @@ public class Cat : EnemyDamageableEntity, ISpawnPoint
         // activate soul drop and disable cat head
         // subscribe to soul event
         soulDrop.SoulDestroyedEvent += OnSoulDestroy;
-
-        headCollider.enabled = false;
+        spawnHazard.enabled = true;
         soulObject.SetActive(true);
     }
 
     private void FinalizeSpawn()
     {
         isAlive = true;
-        headCollider.enabled = true;
+        ignoreDamage = false;
         currentSpawnTime = 0;
         Refresh();
         waiting = false;
         animator.SetTrigger("Respawn");
         animator.SetBool("IsDead", false);
+        spawnHazard.enabled = false;
     }
 
     private void OnSoulDestroy(GameObject sender, bool playerCollected)
