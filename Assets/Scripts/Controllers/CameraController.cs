@@ -10,7 +10,6 @@ public class CameraController : MonoBehaviour {
     public AimingDirectionResolver aimingDirectionResolver;
     public GroundCheck groundCheck;
     public CharacterMovement characterMovement;
-    public Camera camera;
 
     // Hard world limits that the camera cannot pass
     [Tooltip("Left camera limit of the world.")]
@@ -29,6 +28,7 @@ public class CameraController : MonoBehaviour {
     [Tooltip("Amount of units used to move the vertically when the target is aiming.")]
     public float aimingOffsetY = 1.5f;
 
+    private Camera camera;
     private Vector3 originalCameraPosition;
     /// <summary>
     /// Distance in Z between the camera and the target
@@ -49,6 +49,7 @@ public class CameraController : MonoBehaviour {
     // Use this for initialization
     void Start ()
     {
+        camera = GetComponent<Camera>();
         originalCameraPosition = transform.position;
         // Get distance in Z between target and camera
         distanceZ = (target.transform.position - originalCameraPosition).z;
