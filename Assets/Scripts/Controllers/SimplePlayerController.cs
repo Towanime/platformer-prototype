@@ -96,8 +96,9 @@ public class SimplePlayerController : MonoBehaviour {
         if (playerInput.threw && CanThrowEnemy())
         {
             Vector2 aimingDirection = aimingDirectionResolver.GetAimingDirection(grounded);
+            Vector3 throwOriginPosition = aimingDirectionResolver.GetAimEmitorPosition(aimingDirection);
             // If the throw happened start a timer so that the character has to wait before shooting again
-            bool threwEnemy = grabSkill.ThrowEnemy(aimingDirection);
+            bool threwEnemy = grabSkill.ThrowEnemy(aimingDirection, throwOriginPosition);
             if (threwEnemy)
             {
                 throwEnemyTimer = 0;

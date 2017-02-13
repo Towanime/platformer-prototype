@@ -32,6 +32,7 @@ public class Grab : MonoBehaviour
     public Renderer originalArmRenderer;
     public SimplePlayerController controller;
     public CharacterMovement characterMovement;
+    public AimingDirectionResolver aimingDirectionResolver;
     public Animator animator;
     public bool isEnabled = true;
     // has been thrown? is it returning?
@@ -194,14 +195,12 @@ public class Grab : MonoBehaviour
     /// <summary>
     /// Throws an enemy in the direction that the player is aiming.
     /// </summary>
-    public bool ThrowEnemy(Vector2 aimingDirection)
+    public bool ThrowEnemy(Vector2 aimingDirection, Vector3 origin)
     {
         if (grabbedEnemy == null) return false;
         ThrowBehavior grababbleEntity = grabbedEnemy.GetComponent<ThrowBehavior>();
         // Reset Z position to 0 before throwing?
-        Vector3 position = grababbleEntity.transform.position;
-        position.z = 0;
-        grababbleEntity.transform.position = position;
+        grababbleEntity.transform.position = origin;
         grababbleEntity.BeginThrow(aimingDirection, throwSpeed, throwEnemyTravelTime, throwSpeedCurve);
         grabbedEnemy.transform.parent = null;
         grabbedEnemy = null;
@@ -238,8 +237,12 @@ public class Grab : MonoBehaviour
             toAttach.transform.parent = arm.transform;
 
             // change position of the grabbed object
-            toAttach.transform.position = armAnchor.transform.position;
-            toAttach.transform.localPosition = new Vector3(0, -1, 0.3f);
+            Vector3 forwardAimEmitorPosition = aimingDirectionResolver.GetAimEmitorPosition(AimingDirection.Forward);
+            // Set position same as arm but Y same as the throwing direction
+            Vector3 newPosition = armAnchor.transform.position;
+            newPosition.y = forwardAimEmitorPosition.y;
+            toAttach.transform.position = newPosition;
+            toAttach.transform.localPosition = new Vector3(0, toAttach.transform.localPosition.y, 0.3f);
             // store the grabbed enemy
             grabbedEnemy = toAttach;
             // comeback with the target witout penalty

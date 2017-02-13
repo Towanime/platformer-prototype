@@ -4,6 +4,13 @@ using UnityEngine;
 
 public class AimingDirectionResolver : MonoBehaviour {
 
+    // Emitor positions for 8 direction aiming
+    public Transform upAimEmitor;
+    public Transform upForwardAimEmitor;
+    public Transform forwardAimEmitor;
+    public Transform downForwardAimEmitor;
+    public Transform downAimEmitor;
+
     public PlayerInput playerInput;
     public CharacterMovement characterMovement;
     private Vector2 tmp;
@@ -35,6 +42,11 @@ public class AimingDirectionResolver : MonoBehaviour {
     public int GetAimingDirectionValue(bool grounded)
     {
         Vector2 aimingDirection = GetAimingDirection(grounded);
+        return GetAimingDirectionValue(aimingDirection);
+    }
+
+    public int GetAimingDirectionValue(Vector2 aimingDirection)
+    {
         float x = aimingDirection.x;
         float y = aimingDirection.y;
         int aimingDirectionEnum = AimingDirection.Forward;
@@ -64,6 +76,40 @@ public class AimingDirectionResolver : MonoBehaviour {
     public float GetAimingAngle(bool grounded)
     {
         Vector2 aimingDirection = GetAimingDirection(grounded);
+        return GetAimingAngle(aimingDirection);
+    }
+
+    public float GetAimingAngle(Vector2 aimingDirection)
+    {
         return Mathf.Atan2(aimingDirection.y, aimingDirection.x) * Mathf.Rad2Deg;
+    }
+
+    public Vector3 GetAimEmitorPosition(bool grounded)
+    {
+        int aimingDirectionValue = GetAimingDirectionValue(grounded);
+        return GetAimEmitorPosition(aimingDirectionValue);
+    }
+
+    public Vector3 GetAimEmitorPosition(Vector2 aimingDirection)
+    {
+        int aimingDirectionValue = GetAimingDirectionValue(aimingDirection);
+        return GetAimEmitorPosition(aimingDirectionValue);
+    }
+
+    public Vector3 GetAimEmitorPosition(int aimingDirectionValue)
+    {
+        switch (aimingDirectionValue)
+        {
+            case AimingDirection.Up:
+                return upAimEmitor.position;
+            case AimingDirection.UpDiagonal:
+                return upForwardAimEmitor.position;
+            case AimingDirection.DownDiagonal:
+                return downForwardAimEmitor.position;
+            case AimingDirection.Down:
+                return downAimEmitor.position;
+            default:
+                return forwardAimEmitor.position;
+        }
     }
 }
