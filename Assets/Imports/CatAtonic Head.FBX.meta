@@ -35,18 +35,21 @@ ModelImporter:
     2300006: CatNose
     2300008: CatRightEar
     2300010: CatRightEye
+    2300012: //RootNode
     3300000: CatHead
     3300002: CatLeftEar
     3300004: CatLeftEye
     3300006: CatNose
     3300008: CatRightEar
     3300010: CatRightEye
+    3300012: //RootNode
     4300000: CatHead
     4300002: CatLeftEye
     4300004: CatNose
     4300006: CatRightEye
     4300008: CatLeftEar
     4300010: CatRightEar
+    7400000: Take 001
     9500000: //RootNode
   materials:
     importMaterials: 1
