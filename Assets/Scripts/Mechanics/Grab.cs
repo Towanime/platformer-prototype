@@ -28,11 +28,12 @@ public class Grab : MonoBehaviour
     // empty object used to keep the target relative to the player in case it moves
     [Tooltip("Empty object inside the player used for calculations but it'll be likely removed later!.")]
     public GameObject armTarget;
+    [Tooltip("Position that will be applied to a grabbed object relative to the position of the hand.")]
+    public Vector3 grabPositionOffset;
     [Tooltip("Renderer of the rooted arm in the model, it'll be disabled when doing a grab")]
     public Renderer originalArmRenderer;
     public SimplePlayerController controller;
     public CharacterMovement characterMovement;
-    public AimingDirectionResolver aimingDirectionResolver;
     public Animator animator;
     public bool isEnabled = true;
     // has been thrown? is it returning?
@@ -237,12 +238,8 @@ public class Grab : MonoBehaviour
             toAttach.transform.parent = arm.transform;
 
             // change position of the grabbed object
-            Vector3 forwardAimEmitorPosition = aimingDirectionResolver.GetAimEmitorPosition(AimingDirection.Forward);
-            // Set position same as arm but Y same as the throwing direction
-            Vector3 newPosition = armAnchor.transform.position;
-            newPosition.y = forwardAimEmitorPosition.y;
-            toAttach.transform.position = newPosition;
-            toAttach.transform.localPosition = new Vector3(0, toAttach.transform.localPosition.y, 0.3f);
+            toAttach.transform.position = armAnchor.transform.position;
+            toAttach.transform.localPosition = grabPositionOffset;
             // store the grabbed enemy
             grabbedEnemy = toAttach;
             // comeback with the target witout penalty
