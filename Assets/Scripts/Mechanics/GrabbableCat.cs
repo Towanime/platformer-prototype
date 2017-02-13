@@ -9,12 +9,7 @@ public class GrabbableCat : GrabbableEntity
     [Tooltip("Damagable cat component, used to \"kill\" the cat when is grabbed.")]
     public Cat entity;
     // 
-    private Hazard hazardComponent;
-
-    void Start()
-    {
-        hazardComponent = GetComponent<Hazard>();
-    }
+    public Hazard hazardComponent;
 
     public override GameObject OnGrab()
     {

@@ -16,12 +16,11 @@ public class Cat : EnemyDamageableEntity, ISpawnPoint
     private float currentSpawnTime;
     private bool waiting;
     private SoulDrop soulDrop;
-    private Hazard spawnHazard;
+    public Hazard spawnHazard;
 
     void Start()
     {
         Refresh();
-        spawnHazard = GetComponentInChildren<Hazard>();
     }
 
     public void Update()
@@ -43,6 +42,7 @@ public class Cat : EnemyDamageableEntity, ISpawnPoint
         ignoreDamage = true;
         animator.SetBool("IsDead", true);
         spawnHazard.enabled = true;
+        headCollider.enabled = false;
         Debug.Log("Hazard? " +
         spawnHazard.enabled);
     }
@@ -65,6 +65,7 @@ public class Cat : EnemyDamageableEntity, ISpawnPoint
         // subscribe to soul event
         soulDrop.SoulDestroyedEvent += OnSoulDestroy;
         spawnHazard.enabled = true;
+        headCollider.enabled = false;
         soulObject.SetActive(true);
     }
 
@@ -78,6 +79,7 @@ public class Cat : EnemyDamageableEntity, ISpawnPoint
         animator.SetTrigger("Respawn");
         animator.SetBool("IsDead", false);
         spawnHazard.enabled = false;
+        headCollider.enabled = true;
     }
 
     private void OnSoulDestroy(GameObject sender, bool playerCollected)
