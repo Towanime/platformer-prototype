@@ -1,52 +1,42 @@
 fileFormatVersion: 2
-guid: 1b9cf23e78835304788ec096c6b6cea4
-timeCreated: 1486966014
+guid: ea3c76a1e918eec4386a38d3034e335e
+timeCreated: 1487018665
 licenseType: Free
 ModelImporter:
   serializedVersion: 19
   fileIDToRecycleName:
-    100000: Plane001
-    100002: Plane002
-    100004: Plane003
-    100006: Plane004
-    100008: Plane005
-    100010: Plane006
-    100012: Plane007
-    100014: Plane008
-    100016: //RootNode
-    400000: Plane001
-    400002: Plane002
-    400004: Plane003
-    400006: Plane004
-    400008: Plane005
-    400010: Plane006
-    400012: Plane007
-    400014: Plane008
-    400016: //RootNode
-    2300000: Plane001
-    2300002: Plane002
-    2300004: Plane003
-    2300006: Plane004
-    2300008: Plane005
-    2300010: Plane006
-    2300012: Plane007
-    2300014: Plane008
-    3300000: Plane001
-    3300002: Plane002
-    3300004: Plane003
-    3300006: Plane004
-    3300008: Plane005
-    3300010: Plane006
-    3300012: Plane007
-    3300014: Plane008
-    4300000: Plane001
-    4300002: Plane002
-    4300004: Plane003
-    4300006: Plane004
-    4300008: Plane005
-    4300010: Plane006
-    4300012: Plane007
-    4300014: Plane008
+    100000: Branch
+    100002: Branch001
+    100004: Leaves
+    100006: Leaves001
+    100008: Leaves002
+    100010: Tree
+    100012: //RootNode
+    400000: Branch
+    400002: Branch001
+    400004: Leaves
+    400006: Leaves001
+    400008: Leaves002
+    400010: Tree
+    400012: //RootNode
+    2300000: Branch
+    2300002: Branch001
+    2300004: Leaves
+    2300006: Leaves001
+    2300008: Leaves002
+    2300010: Tree
+    3300000: Branch
+    3300002: Branch001
+    3300004: Leaves
+    3300006: Leaves001
+    3300008: Leaves002
+    3300010: Tree
+    4300000: Tree
+    4300002: Branch
+    4300004: Branch001
+    4300006: Leaves
+    4300008: Leaves001
+    4300010: Leaves002
   materials:
     importMaterials: 1
     materialName: 0

@@ -1,22 +1,52 @@
 fileFormatVersion: 2
-guid: 8d1cdcc616faacd42918dc899d6ec0c5
-timeCreated: 1486965057
+guid: 1b9cf23e78835304788ec096c6b6cea4
+timeCreated: 1487018769
 licenseType: Free
 ModelImporter:
   serializedVersion: 19
   fileIDToRecycleName:
-    100000: Capsule001
-    100002: Tree
-    100004: //RootNode
-    400000: Capsule001
-    400002: Tree
-    400004: //RootNode
-    2300000: Capsule001
-    2300002: Tree
-    3300000: Capsule001
-    3300002: Tree
-    4300000: Tree
-    4300002: Capsule001
+    100000: Plane001
+    100002: Plane002
+    100004: Plane003
+    100006: Plane004
+    100008: Plane005
+    100010: Plane006
+    100012: Plane007
+    100014: Plane008
+    100016: //RootNode
+    400000: Plane001
+    400002: Plane002
+    400004: Plane003
+    400006: Plane004
+    400008: Plane005
+    400010: Plane006
+    400012: Plane007
+    400014: Plane008
+    400016: //RootNode
+    2300000: Plane001
+    2300002: Plane002
+    2300004: Plane003
+    2300006: Plane004
+    2300008: Plane005
+    2300010: Plane006
+    2300012: Plane007
+    2300014: Plane008
+    3300000: Plane001
+    3300002: Plane002
+    3300004: Plane003
+    3300006: Plane004
+    3300008: Plane005
+    3300010: Plane006
+    3300012: Plane007
+    3300014: Plane008
+    4300000: Plane001
+    4300002: Plane002
+    4300004: Plane003
+    4300006: Plane004
+    4300008: Plane005
+    4300010: Plane006
+    4300012: Plane007
+    4300014: Plane008
   materials:
     importMaterials: 1
     materialName: 0
