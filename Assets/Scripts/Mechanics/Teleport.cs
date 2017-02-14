@@ -14,6 +14,7 @@ public class Teleport : MonoBehaviour {
     public float floatingTime = 1f;
     public CharacterMovement characterMovement;
     public Animator animator;
+    public bool onlyTargetForward = true;
 
     private bool teleporting;
     private bool floating;
@@ -74,7 +75,7 @@ public class Teleport : MonoBehaviour {
             bool playerIsFacingSoul = xDiff == 0 || Mathf.Sign(xDiff) == characterMovement.FacingDirection;
             float distance = Vector2.Distance(currentPosition, soulPosition);
             // Only if the player is facing the soul
-            if (playerIsFacingSoul && (nearestSoul == null || distance < minDistance))
+            if ((!onlyTargetForward || playerIsFacingSoul) && (nearestSoul == null || distance < minDistance))
             {
                 nearestSoul = soulObject;
                 minDistance = distance;
