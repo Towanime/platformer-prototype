@@ -346,4 +346,9 @@ public class CharacterMovement : MonoBehaviour {
     {
         get { return currentHorizontalSpeed != 0; }
     }
+
+    public float CurrentVerticalSpeed
+    {
+        get { return currentVerticalSpeed; }
+    }
 }

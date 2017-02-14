@@ -16,7 +16,7 @@ public class Cat : EnemyDamageableEntity, ISpawnPoint
     private float currentSpawnTime;
     private bool waiting;
     private SoulDrop soulDrop;
-    public Hazard spawnHazard;
+    public TouchHazard steamHazard;
 
     void Start()
     {
@@ -41,10 +41,8 @@ public class Cat : EnemyDamageableEntity, ISpawnPoint
         isAlive = false;
         ignoreDamage = true;
         animator.SetBool("IsDead", true);
-        spawnHazard.enabled = true;
+        steamHazard.isActive = true;
         headCollider.enabled = false;
-        Debug.Log("Hazard? " +
-        spawnHazard.enabled);
     }
 
     protected override void OnDeath()
@@ -64,7 +62,7 @@ public class Cat : EnemyDamageableEntity, ISpawnPoint
         // activate soul drop and disable cat head
         // subscribe to soul event
         soulDrop.SoulDestroyedEvent += OnSoulDestroy;
-        spawnHazard.enabled = true;
+        steamHazard.isActive = true;
         headCollider.enabled = false;
         soulObject.SetActive(true);
     }
@@ -78,7 +76,7 @@ public class Cat : EnemyDamageableEntity, ISpawnPoint
         waiting = false;
         animator.SetTrigger("Respawn");
         animator.SetBool("IsDead", false);
-        spawnHazard.enabled = false;
+        steamHazard.isActive = false;
         headCollider.enabled = true;
     }
 

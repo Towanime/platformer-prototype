@@ -10,6 +10,7 @@ public class CameraController : MonoBehaviour {
     public AimingDirectionResolver aimingDirectionResolver;
     public GroundCheck groundCheck;
     public CharacterMovement characterMovement;
+    public LayerMask groundLayer;
 
     // Hard world limits that the camera cannot pass
     [Tooltip("Left camera limit of the world.")]
@@ -18,6 +19,17 @@ public class CameraController : MonoBehaviour {
     public Transform rightWorldLimit;
     [Tooltip("Lower camera limit of the world.")]
     public Transform lowerWorldLimit;
+
+    [Tooltip("Maximum distance from the target to the nearest platform that there has to be for the camera to fix its vertical focus on the platform.")]
+    public float platformSnapDistance = 3f;
+    [Tooltip("Offset to apply in Y to the camera when it's focused on a platform.")]
+    public float platformCameraOffset = -2f;
+    [Tooltip("Offset to apply in Y to the camera when the character is falling down.")]
+    public float fallingOffset = -6f;
+    [Tooltip("Time that will take for the camera to go from 0 to the Falling Offset value.")]
+    public float timeToReachMaxFallingOffset = 0.3f;
+    [Tooltip("Curve for the value that is applied for the falling offset.")]
+    public AnimationCurve fallingOffsetAnimationCurve;
 
     [Tooltip("Time taken for the camera to reach the target in X.")]
     public float cameraFollowDampTimeX = 0.05f;
@@ -44,6 +56,10 @@ public class CameraController : MonoBehaviour {
     /// Used to know which part of the guide rectangle to target currently, goes from 0...1. 0 = Left side, 1 = Right side
     /// </summary>
     private float guideDeltaX = 1;
+    private float elapsedFallingTime;
+    private Vector3 cameraCenterWorld;
+    private Vector3 cameraBottomLeftCornerWorld;
+    private Vector3 cameraTopRightCornerWorld;
     private Vector3 tmp;
 
     // Use this for initialization
@@ -61,31 +77,68 @@ public class CameraController : MonoBehaviour {
         UpdateCameraPosition();
     }
 
+    void UpdateCameraWorldCoordinates()
+    {
+        // center
+        tmp.Set(camera.pixelWidth / 2, camera.pixelHeight / 2, distanceZ);
+        cameraCenterWorld = camera.ScreenToWorldPoint(tmp);
+        // bottom-left
+        tmp.Set(0, 0, distanceZ);
+        cameraBottomLeftCornerWorld = camera.ScreenToWorldPoint(tmp);
+        // top-right
+        tmp.Set(camera.pixelWidth, camera.pixelHeight, distanceZ);
+        cameraTopRightCornerWorld = camera.ScreenToWorldPoint(tmp);
+    }
+
+    private void UpdateGuideDeltaX()
+    {
+        float targetDelta = GetFacingDirection() > 0 ? 1 : 0;
+        guideDeltaX = Mathf.SmoothDamp(guideDeltaX, targetDelta, ref currentChangeDirectionDampVelocityX, cameraChangeDirectionDampTime);
+    }
+
     void UpdateCameraPosition()
     {
         Vector3 currentPosition = transform.position;
         Vector3 newPosition = currentPosition;
-        // Set horizontal position first and with neutral vertical position
-        newPosition.x = GetCameraTargetPositionX();
-        newPosition.y = originalCameraPosition.y;
+        // Set desired horizontal and vertical position first
+        newPosition.x = GetCameraNextPositionX();
+        newPosition.y = GetCameraNextPositionY();
         // Adjust camera to horizontal and vertical limits 
-        transform.position = newPosition;
+        SetPosition(newPosition);
+        UpdateCameraWorldCoordinates();
         newPosition.x = GetCameraPositionAdjustedX();
         newPosition.y = GetCameraPositionAdjustedY();
         // Apply aiming vertical direction and adjust camera again to vertical limit
         newPosition.y = ApplyAimingDirectionOffset(newPosition.y);
-        transform.position = newPosition;
+        SetPosition(newPosition);
+        UpdateCameraWorldCoordinates();
         newPosition.y = GetCameraPositionAdjustedY();
         // Finally get current position by applying smoothing
         newPosition.x = Mathf.SmoothDamp(currentPosition.x, newPosition.x, ref currentFollowDampVelocityX, cameraFollowDampTimeX);
         newPosition.y = Mathf.SmoothDamp(currentPosition.y, newPosition.y, ref currentFollowDampVelocityY, cameraFollowDampTimeY);
-        transform.position = newPosition;
+        SetPosition(newPosition);
     }
 
-    void UpdateGuideDeltaX()
+    void SetPosition(Vector3 position)
     {
-        float targetDelta = GetFacingDirection() > 0 ? 1 : 0;
-        guideDeltaX = Mathf.SmoothDamp(guideDeltaX, targetDelta, ref currentChangeDirectionDampVelocityX, cameraChangeDirectionDampTime);
+        transform.position = position;
+        UpdateCameraWorldCoordinates();
+    }
+
+    /// <summary>
+    /// Calculates the final destination of the camera in the X axis
+    /// </summary>
+    /// <returns></returns>
+    private float GetCameraNextPositionX()
+    {
+        // Get the corners of the guide in world coordinates
+        Vector3[] guideWorldCorners = new Vector3[4];
+        horizontalPositionGuide.GetWorldCorners(guideWorldCorners);
+        // Get a position between the left and right side of the rectangle depending on the delta
+        tmp.x = Mathf.Lerp(guideWorldCorners[3].x, guideWorldCorners[0].x, guideDeltaX);
+        Vector3 worldPointCameraOffset = camera.ScreenToWorldPoint(tmp);
+        // Set the goal to the character position plus the offset
+        return target.transform.position.x + (cameraCenterWorld.x - worldPointCameraOffset.x);
     }
 
     /// <summary>
@@ -95,60 +148,85 @@ public class CameraController : MonoBehaviour {
     /// <returns></returns>
     private float GetCameraPositionAdjustedX()
     {
-        // Get the camera corners in world units
-        tmp.Set(0, 0, distanceZ);
-        Vector3 x1y1 = camera.ScreenToWorldPoint(tmp);
-        tmp.Set(camera.pixelWidth, camera.pixelHeight, distanceZ);
-        Vector3 x2y2 = camera.ScreenToWorldPoint(tmp);
         // Compare camera corners to world limits
         float newX = transform.position.x;
-        if (leftWorldLimit != null && x1y1.x < leftWorldLimit.position.x)
+        if (leftWorldLimit != null && cameraBottomLeftCornerWorld.x < leftWorldLimit.position.x)
         {
-            newX += leftWorldLimit.position.x - x1y1.x;
+            newX += leftWorldLimit.position.x - cameraBottomLeftCornerWorld.x;
         }
-        if (rightWorldLimit != null && x2y2.x > rightWorldLimit.position.x)
+        if (rightWorldLimit != null && cameraTopRightCornerWorld.x > rightWorldLimit.position.x)
         {
-            newX -= x2y2.x - rightWorldLimit.position.x;
+            newX -= cameraTopRightCornerWorld.x - rightWorldLimit.position.x;
         }
         return newX;
     }
 
     /// <summary>
-    /// Returns the adjusted Y axis of the camera relative to world limits
+    /// Calculates the final destination of the camera in the Y axis
     /// </summary>
-    /// <param name="y"></param>
     /// <returns></returns>
-    private float GetCameraPositionAdjustedY()
+    private float GetCameraNextPositionY()
     {
-        // Get the camera corners in world units
-        tmp.Set(0, 0, distanceZ);
-        Vector3 x1y1 = camera.ScreenToWorldPoint(tmp);
-        // Compare camera corners to world limits
-        float newY = transform.position.y;
-        if (lowerWorldLimit != null && x1y1.y < lowerWorldLimit.position.y)
+        // First check if there's a platform beneath the target (no matter if its grounded or not)
+        RaycastHit[] hitInfoArray = Physics.RaycastAll(target.transform.position, Vector3.down, platformSnapDistance, groundLayer.value);
+        if (hitInfoArray.Length > 0)
         {
-            newY += lowerWorldLimit.position.y - x1y1.y;
+            return GetCameraFocusOnNearestPlatformPositionY(hitInfoArray);
         }
-        return newY;
+        // If there's no platform just focus on the target
+        return GetCameraFocusOnTargetPositionY();
     }
 
     /// <summary>
-    /// Calculates the final destination of the camera in the X axis
+    /// Gets the position that the camera has to move to when focusing vertically on the nearest platform.
+    /// </summary>
+    /// <param name="hitInfoArray"></param>
+    /// <returns></returns>
+    private float GetCameraFocusOnNearestPlatformPositionY(RaycastHit[] hitInfoArray)
+    {
+        // Get the closest platform
+        RaycastHit closestPlatform = hitInfoArray[0];
+        for (int i = 1; i<hitInfoArray.Length; i++)
+        {
+            RaycastHit currentPlatform = hitInfoArray[i];
+            if (currentPlatform.distance < closestPlatform.distance)
+            {
+                closestPlatform = currentPlatform;
+            }
+        }
+        float distanceToMove = closestPlatform.point.y - platformCameraOffset - cameraCenterWorld.y;
+        return transform.position.y + distanceToMove;
+    }
+
+    /// <summary>
+    /// Gets the position that the camera has to move to when focusing vertically on the target.
     /// </summary>
     /// <returns></returns>
-    private float GetCameraTargetPositionX()
+    private float GetCameraFocusOnTargetPositionY()
     {
-        // Get the center of the camera in world coordinates
-        tmp.Set(camera.pixelWidth / 2, camera.pixelHeight / 2, distanceZ);
-        Vector3 worldPointCameraCenter = camera.ScreenToWorldPoint(tmp);
-        // Get the corners of the guide in world coordinates
-        Vector3[] guideWorldCorners = new Vector3[4];
-        horizontalPositionGuide.GetWorldCorners(guideWorldCorners);
-        // Get a position between the left and right side of the rectangle depending on the delta
-        tmp.x = Mathf.Lerp(guideWorldCorners[3].x, guideWorldCorners[0].x, guideDeltaX);
-        Vector3 worldPointCameraOffset = camera.ScreenToWorldPoint(tmp);
-        // Set the goal to the character position plus the offset
-        return target.transform.position.x + (worldPointCameraCenter.x - worldPointCameraOffset.x);
+        float distanceY = target.transform.position.y - cameraCenterWorld.y;
+        return transform.position.y + distanceY + GetFallingOffset();
+    }
+
+    /// <summary>
+    /// Gets the offset to apply when focusing vertically on the target. 
+    /// If the target is falling this offset will be between 0 and fallingOffset, 
+    /// otherwise it will be 0.
+    /// </summary>
+    /// <returns></returns>
+    private float GetFallingOffset()
+    {
+        float currentFallingOffset = 0;
+        if (GetCurrentVerticalSpeed() < 0 && !groundCheck.IsGrounded)
+        {
+            elapsedFallingTime += Time.deltaTime;
+            float t = fallingOffsetAnimationCurve.Evaluate(elapsedFallingTime / timeToReachMaxFallingOffset);
+            currentFallingOffset = Mathf.Lerp(0, fallingOffset, t);
+        } else
+        {
+            elapsedFallingTime = 0;
+        }
+        return currentFallingOffset;
     }
 
     /// <summary>
@@ -167,11 +245,32 @@ public class CameraController : MonoBehaviour {
     }
 
     /// <summary>
+    /// Returns the adjusted Y axis of the camera relative to world limits
+    /// </summary>
+    /// <param name="y"></param>
+    /// <returns></returns>
+    private float GetCameraPositionAdjustedY()
+    {
+        // Compare camera corners to world limits
+        float newY = transform.position.y;
+        if (lowerWorldLimit != null && cameraBottomLeftCornerWorld.y < lowerWorldLimit.position.y)
+        {
+            newY += lowerWorldLimit.position.y - cameraBottomLeftCornerWorld.y;
+        }
+        return newY;
+    }
+
+    /// <summary>
     /// Gets the direction in which the target is facing, right by default
     /// </summary>
     /// <returns></returns>
     private float GetFacingDirection()
     {
         return characterMovement != null ? characterMovement.FacingDirection : 1;
+    }
+
+    private float GetCurrentVerticalSpeed()
+    {
+        return characterMovement != null ? characterMovement.CurrentVerticalSpeed : 0;
     }
 }
