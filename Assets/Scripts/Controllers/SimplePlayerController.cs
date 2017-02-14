@@ -73,11 +73,10 @@ public class SimplePlayerController : MonoBehaviour {
         }
     }
 
-    private void HandleShooting()
+    private void HandleShooting(bool grounded)
     {
-        if (playerInput.shooting && CanShoot())
+        if ((playerInput.startedShooting && CanStartShooting()) || (playerInput.shooting && CanContinueShooting(grounded)))
         {
-            bool grounded = groundCheck.IsGrounded;
             float aimingAngle = aimingDirectionResolver.GetAimingAngle(grounded);
             gatlingGun.Fire(aimingAngle);
         }
@@ -118,9 +117,14 @@ public class SimplePlayerController : MonoBehaviour {
         return grabSkill.IsHolding;
     }
 
-    private bool CanShoot()
+    private bool CanStartShooting()
     {
-        return !grabSkill.IsHolding && !isInThrowEnemyDelay;
+        return !grabSkill.IsHolding && !isInThrowEnemyDelay && !teleport.IsTeleporting;
+    }
+
+    private bool CanContinueShooting(bool grounded)
+    {
+        return CanStartShooting() && !teleport.IsFloating;
     }
 
     private bool IsStopFloating(bool grounded, bool jumped)
@@ -139,7 +143,8 @@ public class SimplePlayerController : MonoBehaviour {
     {
         if (!isEnabled) return;
 
-        HandleShooting();
+        bool grounded = groundCheck.IsGrounded;
+        HandleShooting(grounded);
     }
 
     public bool IsEnabled

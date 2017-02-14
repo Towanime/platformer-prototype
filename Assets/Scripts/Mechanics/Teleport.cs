@@ -9,9 +9,9 @@ public class Teleport : MonoBehaviour {
     [Tooltip("Object with the same dimentions as the player that is used to readjust the position of the teleport.")]
     public GameObject teleportDummy;
     [Tooltip("How fast the player teleports.")]
-    public float teleportSpeed = 15f;
+    public float teleportSpeed = 40f;
     [Tooltip("Time in seconds that the player will stay floating after the teleport ends.")]
-    public float floatingTime = 2f;
+    public float floatingTime = 1f;
     public CharacterMovement characterMovement;
     public Animator animator;
 

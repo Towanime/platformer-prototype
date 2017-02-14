@@ -9,6 +9,7 @@ public class PlayerInput : MonoBehaviour {
     public bool grabbed;
     public bool holdingJump;
     public bool jumped;
+    public bool startedShooting;
     public bool shooting;
     public bool teleported;
     public bool threw;
@@ -67,6 +68,7 @@ public class PlayerInput : MonoBehaviour {
 
     void SetShoot()
     {
+        startedShooting = Input.GetKeyDown(this.keyboardMouseConfig.shot) || Input.GetKeyDown(this.windowsGamepadConfig.shot);
         shooting = Input.GetKey(this.keyboardMouseConfig.shot) || Input.GetKey(this.windowsGamepadConfig.shot);
     }
 
