@@ -65,6 +65,8 @@ public class GatlingGun : MonoBehaviour {
         if (!wait)
         {
             GameObject bullet = BulletPool.instance.GetObject();
+            // clear bullet trail
+            bullet.GetComponent<TrailRenderer>().Clear();
             bullet.transform.position = GetBulletSpawnPosition(aimingAngle);
             Bullet component = bullet.GetComponent<Bullet>();
             component.SetDirection(GetBulletDirection(aimingAngle));
