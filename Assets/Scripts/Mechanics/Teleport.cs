@@ -21,9 +21,11 @@ public class Teleport : MonoBehaviour {
     private float currentTimeFloating = 0;
     private bool dummyEnabled;
     private Vector3 tmp;
+    private GameObject nearestSoul;
 
     void FixedUpdate()
     {
+        UpdateNearestSoul();
         if (teleporting)
         {
             UpdateTeleport();
@@ -36,6 +38,11 @@ public class Teleport : MonoBehaviour {
             }
             currentTimeFloating += Time.fixedDeltaTime;
         }
+    }
+
+    private void UpdateNearestSoul()
+    {
+        nearestSoul = GetNearestSoul();
     }
 
     private void UpdateTeleport()
@@ -87,7 +94,6 @@ public class Teleport : MonoBehaviour {
     public bool DoTeleport()
     {
         // Automatically grab the soul that's closest to the player
-        GameObject nearestSoul = GetNearestSoul();
         if (nearestSoul != null)
         {
             teleporting = true;
