@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class Teleport : MonoBehaviour {
@@ -15,6 +16,7 @@ public class Teleport : MonoBehaviour {
     public CharacterMovement characterMovement;
     public Animator animator;
     public bool onlyTargetForward = true;
+    public float soulOutlineWidth = 1f;
 
     private bool teleporting;
     private bool floating;
@@ -42,7 +44,24 @@ public class Teleport : MonoBehaviour {
 
     private void UpdateNearestSoul()
     {
+        GameObject oldNearestSoul = nearestSoul;
         nearestSoul = GetNearestSoul();
+        // Change the outline of the nearest soul
+        if (oldNearestSoul != nearestSoul)
+        {
+            // Make it invisible for the old nearest soul
+            if (oldNearestSoul != null)
+            {
+                Renderer renderer = oldNearestSoul.GetComponent<Renderer>();
+                renderer.material.SetFloat("_Outline", 0);
+            }
+            // Make it visible for the new one
+            if (nearestSoul != null)
+            {
+                Renderer renderer = nearestSoul.GetComponent<Renderer>();
+                renderer.material.SetFloat("_Outline", soulOutlineWidth);
+            }
+        }
     }
 
     private void UpdateTeleport()
