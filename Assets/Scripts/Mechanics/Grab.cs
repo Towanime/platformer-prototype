@@ -30,6 +30,8 @@ public class Grab : MonoBehaviour
     public GameObject armTarget;
     [Tooltip("Position that will be applied to a grabbed object relative to the position of the hand.")]
     public Vector3 grabPositionOffset;
+    [Tooltip("Rotation that will be added to a grabbed object relative to its original rotation.")]
+    public Vector3 grabRotationOffset;
     [Tooltip("Renderer of the rooted arm in the model, it'll be disabled when doing a grab")]
     public Renderer originalArmRenderer;
     public SimplePlayerController controller;
@@ -240,6 +242,7 @@ public class Grab : MonoBehaviour
             // change position of the grabbed object
             toAttach.transform.position = armAnchor.transform.position;
             toAttach.transform.localPosition = grabPositionOffset;
+            toAttach.transform.rotation = toAttach.transform.rotation * Quaternion.Euler(grabRotationOffset);
             // store the grabbed enemy
             grabbedEnemy = toAttach;
             // comeback with the target witout penalty
