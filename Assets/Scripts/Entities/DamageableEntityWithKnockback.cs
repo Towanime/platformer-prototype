@@ -26,6 +26,8 @@ public class DamageableEntityWithKnockback : DamageableEntity {
     private bool stunned;
     private float elapsedTime;
     private float elapsedFickerTime;
+    // spawn point in case of death
+    private PlayerCheckpoint checkpoint;
 
     public override bool OnDamage(GameObject origin, float damage)
     {
@@ -44,6 +46,15 @@ public class DamageableEntityWithKnockback : DamageableEntity {
             }
         }
         return damaged;
+    }
+
+    protected override void OnDeath()
+    {
+        // spawn to last checkpoint if life <= 0
+        if (currentLife <= 0)
+        {
+            GetComponentInChildren<PlayerCheckpoint>().Spawn();
+        }
     }
 
     private void ApplyKnockback(GameObject origin)
@@ -124,4 +135,5 @@ public class DamageableEntityWithKnockback : DamageableEntity {
     {
         lblTemp.text = "Life: " + currentLife + " / " + life;
     }
+
 }
