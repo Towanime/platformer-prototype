@@ -13,6 +13,12 @@ public class Hazard : MonoBehaviour {
     public float damage;
     [Tooltip("Layers of the objects that can be damaged by this component.")]
     public LayerMask targetLayerMask;
+    private Animator animator;
+
+    void Start()
+    {
+        animator = GetComponent<Animator>();
+    }
 
     /// <summary>
     /// Checks if the given GameObject is part of the targets of this component depending on its layer.
