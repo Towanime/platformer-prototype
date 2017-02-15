@@ -9,6 +9,8 @@ public class Cat : EnemyDamageableEntity, ISpawnPoint
     public float soulDropDistance;
     [Tooltip("Time to enable the cat head after the soul dissapears.")]
     public float spawnTime;
+    [Tooltip("True to make the soul always spawn on top of the cat without taking rotation into account.")]
+    public bool fixedSoulSpawnPosition;
     //
     public Collider headCollider;
     public Animator animator;
@@ -57,7 +59,13 @@ public class Cat : EnemyDamageableEntity, ISpawnPoint
         soulDrop.Initialize(null);
         // set on top of the cat
         Vector3 position = transform.position;
-        position.y += soulDropDistance;
+        if (fixedSoulSpawnPosition)
+        {
+            position.y += soulDropDistance;
+        } else
+        {
+            position += transform.forward * soulDropDistance;
+        }
         soulObject.transform.position = position;
         // activate soul drop and disable cat head
         // subscribe to soul event
