@@ -23,6 +23,8 @@ public class GatlingGun : MonoBehaviour {
     public bool isEnabled = true;
     [Tooltip("Temporal way to show the overheat.")]
     public Text lblTemp;
+    [Tooltip("Object that contains the physical gun.")]
+    public GameObject gatlingGunObject;
     // cooldown vars
     private float currentCooldown;
     private bool wait;
@@ -32,6 +34,11 @@ public class GatlingGun : MonoBehaviour {
     private bool lastFiringGun = false;
     private bool isOverheated;
     private Vector2 tmp;
+
+    void Start()
+    {
+        SetGunEnabled(isEnabled);
+    }
 
     void FixedUpdate()
     {
@@ -130,5 +137,26 @@ public class GatlingGun : MonoBehaviour {
         {
             return this.lastFiringGun;
         }
+    }
+
+    public bool IsEnabled
+    {
+        get {
+            return isEnabled;
+        }
+        set {
+            isEnabled = value;
+            // show/hide gun
+            SetGunEnabled(isEnabled);
+        }
+    }
+
+    /// <summary>
+    /// Enables the object that holds the renderer for the gun
+    /// </summary>
+    /// <param name="enabled"></param>
+    public void SetGunEnabled(bool enabled)
+    {
+        gatlingGunObject.SetActive(enabled);
     }
 }
