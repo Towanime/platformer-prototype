@@ -7,6 +7,8 @@ using UnityEngine;
 /// </summary>
 public class GrabTrigger : MonoBehaviour
 {
+    [Tooltip("Damageable entity to hurt when the grab touches a grab hazard.")]
+    public DamageableEntity player;
     public LayerMask layersToIgnore;
     private Grab grabComponent;
 
@@ -18,6 +20,11 @@ public class GrabTrigger : MonoBehaviour
     public void OnTriggerEnter(Collider other)
     {
         if (Util.IsObjectInLayerMask(layersToIgnore, other.gameObject)) return;
+        if (other.CompareTag("Grab Hazard"))
+        {
+            player.OnDamage(other.gameObject, 1);
+            return;
+        }
         grabComponent.OnCollision(other);
     }
 

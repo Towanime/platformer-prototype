@@ -13,19 +13,11 @@ public class GrabbableCat : GrabbableEntity
 
     public override GameObject OnGrab()
     {
-        AnimatorStateInfo animatorInfo = entity.animator.GetCurrentAnimatorStateInfo(0);
-        if (hazardComponent.isActive)
-        {
-            // do damage
-            return null;
-        }else
-        {
-            // "kill" the cat and set it as spawn point
-            entity.GrabKill();
-            GameObject head = Instantiate(headPrefab, gameObject.transform) as GameObject;
-            // set spawn point
-            head.GetComponent<EnemyDamageableEntity>().spawn = entity;
-            return head;
-        }
+        // "kill" the cat and set it as spawn point
+        entity.GrabKill();
+        GameObject head = Instantiate(headPrefab, gameObject.transform) as GameObject;
+        // set spawn point
+        head.GetComponent<EnemyDamageableEntity>().spawn = entity;
+        return head;
     }
 }

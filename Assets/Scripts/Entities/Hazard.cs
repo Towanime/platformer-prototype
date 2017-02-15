@@ -57,11 +57,11 @@ public class Hazard : MonoBehaviour {
     /// </summary>
     public void ActivateHazard()
     {
-        isActive = true;
+       // isActive = true;
     }
 
     public void DesactivateHazard()
     {
-        isActive = false;
+        //isActive = false;
     }
 }
