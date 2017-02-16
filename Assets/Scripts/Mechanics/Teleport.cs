@@ -13,13 +13,11 @@ public class Teleport : MonoBehaviour {
     public float teleportSpeed = 40f;
     [Tooltip("Time in seconds that the player will stay floating after the teleport ends.")]
     public float floatingTime = 1f;
-    public CharacterMovement characterMovement;
+    public AimingDirectionResolver aimingDirectionResolver;
     public Animator animator;
     public bool onlyTargetForward = true;
     public float soulOutlineWidth = 1f;
 
-    private bool teleporting;
-    private bool floating;
     private float currentTimeFloating = 0;
     private bool dummyEnabled;
     private Vector3 tmp;
@@ -28,18 +26,6 @@ public class Teleport : MonoBehaviour {
     void FixedUpdate()
     {
         UpdateNearestSoul();
-        if (teleporting)
-        {
-            UpdateTeleport();
-        }
-        if (floating)
-        {
-            if (currentTimeFloating >= floatingTime)
-            {
-                floating = false;
-            }
-            currentTimeFloating += Time.fixedDeltaTime;
-        }
     }
 
     private void UpdateNearestSoul()
@@ -64,7 +50,32 @@ public class Teleport : MonoBehaviour {
         }
     }
 
-    private void UpdateTeleport()
+    public void BeginFloating()
+    {
+        currentTimeFloating = 0;
+    }
+
+    public bool UpdateFloating()
+    {
+        currentTimeFloating += Time.fixedDeltaTime;
+        return currentTimeFloating >= floatingTime;
+    }
+
+    public bool BeginTeleport()
+    {
+        // Automatically grab the soul that's closest to the player
+        if (nearestSoul != null)
+        {
+            // Set the dummy to the position of the soul so that we can use 
+            // the position after the collision adjustements have been done
+            UpdateDummyPosition(nearestSoul.transform.position);
+            animator.SetTrigger("ShadowWalk");
+            return true;
+        }
+        return false;
+    }
+
+    public bool UpdateTeleport()
     {
         if (dummyEnabled)
         {
@@ -80,11 +91,9 @@ public class Teleport : MonoBehaviour {
         transform.position = nextPosition;
         if (nextPosition == toPosition)
         {
-            teleporting = false;
-            // Once the teleport is finished, let the player float for some time
-            floating = true;
-            currentTimeFloating = 0;
+            return true;
         }
+        return false;
     }
 
     public GameObject GetNearestSoul()
@@ -98,7 +107,7 @@ public class Teleport : MonoBehaviour {
             GameObject soulObject = souls[i];
             Vector3 soulPosition = soulObject.transform.position;
             float xDiff = soulPosition.x - currentPosition.x;
-            bool playerIsFacingSoul = xDiff == 0 || Mathf.Sign(xDiff) == characterMovement.FacingDirection;
+            bool playerIsFacingSoul = xDiff == 0 || Mathf.Sign(xDiff) == aimingDirectionResolver.FacingDirection;
             float distance = Vector2.Distance(currentPosition, soulPosition);
             // Only if the player is facing the soul
             if ((!onlyTargetForward || playerIsFacingSoul) && (nearestSoul == null || distance < minDistance))
@@ -108,20 +117,6 @@ public class Teleport : MonoBehaviour {
             }
         }
         return nearestSoul;
-    }
-
-    public bool DoTeleport()
-    {
-        // Automatically grab the soul that's closest to the player
-        if (nearestSoul != null)
-        {
-            teleporting = true;
-            // Set the dummy to the position of the soul so that we can use 
-            // the position after the collision adjustements have been done
-            UpdateDummyPosition(nearestSoul.transform.position);
-            animator.SetTrigger("ShadowWalk");
-        }
-        return teleporting;
     }
 
     private void UpdateDummyPosition(Vector3 position)
@@ -146,17 +141,17 @@ public class Teleport : MonoBehaviour {
 
     public bool HasTarget
     {
-        get { return teleportTriggerArea.Souls.Count > 0; }
+        get { return nearestSoul != null; }
     }
 
     public bool IsTeleporting
     {
-        get { return teleporting; }
+        get { return true; }
     }
 
     public bool IsFloating
     {
-        get { return floating; }
-        set { floating = value; }
+        get { return true; }
+        set { bool a = value; }
     }
 }

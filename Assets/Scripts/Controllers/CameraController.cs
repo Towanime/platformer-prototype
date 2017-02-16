@@ -266,7 +266,7 @@ public class CameraController : MonoBehaviour {
     /// <returns></returns>
     private float GetFacingDirection()
     {
-        return characterMovement != null ? characterMovement.FacingDirection : 1;
+        return characterMovement != null ? aimingDirectionResolver.FacingDirection : 1;
     }
 
     private float GetCurrentVerticalSpeed()
