@@ -4,7 +4,6 @@ using System.Collections;
 public class CharacterMovement : MonoBehaviour {
 
     public CharacterController characterController;
-    public AimingDirectionResolver aimingDirectionResolver;
     public GroundCheck groundCheck;
     private Vector2 tmpVector2 = Vector2.zero;
     private Vector3 tmpVector3 = Vector3.zero;
@@ -89,7 +88,7 @@ public class CharacterMovement : MonoBehaviour {
     private float timeInTheAir = 0f;
     private float timeSinceJumpStarted = 0f;
     private bool cutJumpShort = false;
-    private bool characterJustJumped;
+    private bool jumpStarted;
 
     public void UpdateInput(float horizontalInput, bool holdingJump)
     {
@@ -122,7 +121,7 @@ public class CharacterMovement : MonoBehaviour {
         if (canJump)
         {
             cutJumpShort = false;
-            characterJustJumped = true;
+            jumpStarted = true;
             return true;
         }
         return false;
@@ -148,16 +147,13 @@ public class CharacterMovement : MonoBehaviour {
         if (moving && !pressingDirection)
         {
             float friction = (grounded) ? groundFriction : airFriction;
-            currentHorizontalSpeed = currentHorizontalSpeed + friction * Time.fixedDeltaTime * -currentMovingDirection;
+            float frictionModifier = friction * Time.fixedDeltaTime * -currentMovingDirection;
+            if (Mathf.Abs(frictionModifier) > Mathf.Abs(currentHorizontalSpeed))
+            {
+                frictionModifier = -currentHorizontalSpeed;
+            }
             // If no direction is being pressed then clamp the speed to 0 once reached.
-            if (currentMovingDirection > 0)
-            {
-                currentHorizontalSpeed = Mathf.Max(0, currentHorizontalSpeed);
-            }
-            else
-            {
-                currentHorizontalSpeed = Mathf.Min(0, currentHorizontalSpeed);
-            }
+            currentHorizontalSpeed += frictionModifier;
         }
         else if (pressingDirection)
         {
@@ -195,11 +191,11 @@ public class CharacterMovement : MonoBehaviour {
         {
             jumping = false;
         }
-        if (characterJustJumped)
+        if (jumpStarted)
         {
             currentVerticalSpeed = jumpImpulse;
             timeSinceJumpStarted = 0;
-            characterJustJumped = false;
+            jumpStarted = false;
             grounded = false;
             jumping = true;
         }
@@ -257,8 +253,8 @@ public class CharacterMovement : MonoBehaviour {
     /// <param name="y"></param>
     public void AddForce(float x, float y)
     {
-        currentHorizontalSpeed = x;
-        currentVerticalSpeed = y;
+        currentHorizontalSpeed += x;
+        currentVerticalSpeed += y;
     }
 
     public bool IsMoving

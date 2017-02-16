@@ -6,8 +6,13 @@ using System;
 public abstract class BaseActivator : MonoBehaviour
 {
 
-    public abstract void Activate(GameObject trigger);
+    public virtual void Activate(GameObject trigger) {
 
-    public abstract void Desactivate();
+    }
+
+    public virtual void Desactivate()
+    {
+
+    }
 
 }

@@ -63,7 +63,7 @@ public class DamageableEntityWithKnockback : DamageableEntity {
         // to determine the direction of the knockback
         bool attackFromTheRight = origin.transform.position.x >= transform.position.x;
         float knockbackXDirection = attackFromTheRight ? -1 : 1;
-        characterMovement.AddForce(knockbackForceX * knockbackXDirection, knockbackForceY);
+        characterMovement.SetSpeed(knockbackForceX * knockbackXDirection, knockbackForceY);
     }
 
 	void Update () {

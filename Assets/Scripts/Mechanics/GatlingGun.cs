@@ -55,8 +55,16 @@ public class GatlingGun : MonoBehaviour {
         float overheatModifier = Time.fixedDeltaTime * (isFiringGun ? 1 : -recoverRate);
         currentOverheat = Mathf.Clamp(currentOverheat + overheatModifier, 0, overheatLimit);
         // Update the isOverheated value
-        if (currentOverheat <= 0) isOverheated = false;
-        if (currentOverheat >= overheatLimit) isOverheated = true;
+        if (currentOverheat <= 0)
+        {
+            isOverheated = false;
+            SoundManager.Instance.Stop(SoundManager.Instance.overheatSound);
+        }
+        if (currentOverheat >= overheatLimit)
+        {
+            isOverheated = true;
+            SoundManager.Instance.Play(SoundManager.Instance.overheatSound);
+        }
         UpdateLabel();
         lastFiringGun = isFiringGun;
         isFiringGun = false;
@@ -85,6 +93,7 @@ public class GatlingGun : MonoBehaviour {
             // start cooldown
             wait = true;
             currentCooldown = 0;
+            SoundManager.Instance.Play(SoundManager.Instance.bulletSpawnSound);
             return true;
         }
         return false;

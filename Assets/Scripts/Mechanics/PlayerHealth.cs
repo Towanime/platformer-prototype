@@ -51,8 +51,6 @@ public class PlayerHealth : DamageableEntity {
 
     public void BeginKnockback(GameObject origin)
     {
-        // Reset speed first
-        characterMovement.SetSpeed(0, 0);
         // Use the position of the hazard to see if the attack came from the left or the right
         // to determine the direction of the knockback
         float knockBackDirection = -aimingDirectionResolver.FacingDirection;
@@ -61,7 +59,7 @@ public class PlayerHealth : DamageableEntity {
             bool attackFromTheRight = origin.transform.position.x >= transform.position.x;
             float knockbackXDirection = attackFromTheRight ? -1 : 1;
         }
-        characterMovement.AddForce(knockbackForceX * knockBackDirection, knockbackForceY);
+        characterMovement.SetSpeed(knockbackForceX * knockBackDirection, knockbackForceY);
         elapsedKnockbackTime = 0;
     }
 

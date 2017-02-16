@@ -90,7 +90,11 @@ public class ActionStateMachine : MonoBehaviour {
     {
         // Let player jump in midair if he's floating
         bool canJumpInMidAir = actionStateMachine.LastState == ActionStates.Floating;
-        characterMovement.Jump(canJumpInMidAir);
+        bool jumped = characterMovement.Jump(canJumpInMidAir);
+        if (jumped)
+        {
+            SoundManager.Instance.PlayRandom(SoundManager.Instance.jumpSounds);
+        }
         actionStateMachine.ChangeState(ActionStates.Idle);
     }
 
@@ -203,6 +207,7 @@ public class ActionStateMachine : MonoBehaviour {
         movementStateMachine.ChangeState(MovementStates.InputDisabled);
         aimStateMachine.ChangeState(AimStates.Disabled);
         playerHealth.BeginKnockback(damageOrigin);
+        SoundManager.Instance.PlayRandom(SoundManager.Instance.avatarPainSounds);
     }
 
     void Damaged_Update()
