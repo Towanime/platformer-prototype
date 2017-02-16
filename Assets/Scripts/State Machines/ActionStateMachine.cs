@@ -24,7 +24,7 @@ public class ActionStateMachine : MonoBehaviour {
     private PlayerCheckpoint playerCheckpoint;
 
     // Use this for initialization
-    void Awake() {
+    void Start() {
         vulnerabilityStateMachine = GetComponent<VulnerabilityStateMachine>().StateMachine;
         movementStateMachine = GetComponent<MovementStateMachine>().StateMachine;
         aimStateMachine = GetComponent<AimingStateMachine>().StateMachine;
