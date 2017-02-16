@@ -7,6 +7,7 @@ public class MovementStateMachine : MonoBehaviour {
 
     public PlayerInput playerInput;
     public CharacterMovement characterMovement;
+    public GroundCheck groundCheck;
     private StateMachine<MovementStates> stateMachine;    
 
     // Use this for initialization
@@ -31,7 +32,8 @@ public class MovementStateMachine : MonoBehaviour {
 
     void InputEnabled_FixedUpdate()
     {
-        characterMovement.UpdateInput(playerInput.lockAim ? 0 : playerInput.horizontalDirection, playerInput.holdingJump);
+        bool isLockingAim = groundCheck.IsGrounded && playerInput.lockAim;
+        characterMovement.UpdateInput(isLockingAim ? 0 : playerInput.horizontalDirection, playerInput.holdingJump);
         characterMovement.Move();
     }
 
