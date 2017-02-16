@@ -45,6 +45,7 @@ public class Cat : EnemyDamageableEntity, ISpawnPoint
         animator.SetBool("IsDead", true);
         steamHazard.isActive = true;
         headCollider.enabled = false;
+        ShowRenderer(false);
     }
 
     protected override void OnDeath()
@@ -88,6 +89,17 @@ public class Cat : EnemyDamageableEntity, ISpawnPoint
         headCollider.enabled = true;
     }
 
+    protected void ShowRenderer(bool show)
+    {
+        Renderer[] renderChildren = GetComponentsInChildren<Renderer>();
+
+        for (int i = 0; i < renderChildren.Length; ++i)
+        {
+            renderChildren[i].enabled = show;
+        }
+
+    }
+
     private void OnSoulDestroy(GameObject sender, bool playerCollected)
     {
         // start the spawn counter
@@ -99,6 +111,7 @@ public class Cat : EnemyDamageableEntity, ISpawnPoint
     public bool Spawn()
     {
         waiting = true;
+        ShowRenderer(true);
         return true;
     }
 
