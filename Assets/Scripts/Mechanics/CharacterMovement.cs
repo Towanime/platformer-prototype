@@ -2,10 +2,9 @@
 using System.Collections;
 
 public class CharacterMovement : MonoBehaviour {
-    public PlayerInput playerInput;
-    public bool processInput = true;
-    public bool freezeMovement = false;
+
     public CharacterController characterController;
+    public AimingDirectionResolver aimingDirectionResolver;
     public GroundCheck groundCheck;
     private Vector2 tmpVector2 = Vector2.zero;
     private Vector3 tmpVector3 = Vector3.zero;
@@ -20,36 +19,23 @@ public class CharacterMovement : MonoBehaviour {
     /// </summary>
     [Tooltip("Used when moving in one direction while pressing the other")]
     public float reactivityPercent = 0.5f;
-    [Tooltip("Used when moving in one direction while pressing the other")]
-    public FlipingMethod flipingMethod = FlipingMethod.Mirror;
-    /// <summary>
-    /// How much time the rotation will take until the character 
-    /// faces the same direction that is being pressed
-    /// </summary>
-    [Tooltip("How much time the rotation will take until the character faces the same direction that is being pressed. Only used if flip method is \"Rotation\"")]
-    public float timeToFlipFacingDirection = 0.2f;
     private float currentHorizontalSpeed = 0f;
     /// <summary>
     /// Direction in which the character is moving (-1 = left, 1 = right).
     /// </summary>
     private float currentMovingDirection = 1f;
     /// <summary>
-    /// Direction that the player was pressing in the last frame (-1 = left, 1 = right). 
-    /// If the player is not pressing any direction then the last direction pressed is retained.
+    /// Direction in which the character was pressing during the last update (-1 = left, 1 = right).
     /// </summary>
-    private float facingDirection = 1f;
-
-    // Rotation variables
-    private Quaternion fromRotation;
-    private Quaternion toRotation;
-    private Quaternion originalRotation;
-    private Vector3 originalScale;
-    private float currentRotationTime = 0f;
+    private float currentInputDirection = 1f;
     /// <summary>
-    /// True if the character's rotation is being adjusted to 
-    /// face the same direction that the player is pressing.
+    /// Current input, reset to 0 after each Move() call
     /// </summary>
-    private bool rotating = false;
+    private float horizontalInput = 0;
+    /// <summary>
+    /// True if the player is holding the jump button
+    /// </summary>
+    private bool holdingJump;
 
     // Vertical movement variables
     /// <summary>
@@ -105,54 +91,35 @@ public class CharacterMovement : MonoBehaviour {
     private bool cutJumpShort = false;
     private bool characterJustJumped;
 
-    public enum FlipingMethod
+    public void UpdateInput(float horizontalInput, bool holdingJump)
     {
-        Mirror,
-        Rotation
+        this.horizontalInput = horizontalInput;
+        this.holdingJump = holdingJump;
     }
 
-    void Start()
+    public void Move()
     {
-        originalScale = transform.localScale;
-        originalRotation = transform.localRotation;
-    }
-    
-    void FixedUpdate()
-    {   
         if (currentHorizontalSpeed != 0)
         {
             currentMovingDirection = Mathf.Sign(currentHorizontalSpeed);
         }
-        // Either -1, 0 or 1
-        float horizontalInput = GetHorizontalInput();
         // Either -1 or 1, see lastInputDirection for details.
-        float currentInputDirection = facingDirection;
+        float newInputDirection = currentInputDirection;
         if (horizontalInput != 0)
         {
-            currentInputDirection = horizontalInput;
+            newInputDirection = horizontalInput;
         }
         grounded = groundCheck.IsGrounded;
-        UpdateSpeed(grounded, horizontalInput, currentInputDirection);
-        if (freezeMovement)
-        {
-            currentHorizontalSpeed = 0;
-            currentVerticalSpeed = 0;
-        }
+        UpdateSpeed(grounded, horizontalInput, newInputDirection);
         UpdatePosition();
-        UpdateRotation(currentInputDirection);
-        facingDirection = currentInputDirection;
+        currentInputDirection = newInputDirection;
+        UpdateInput(0, false);
     }
 
-    private float GetHorizontalInput()
+    public bool Jump(bool canJumpInMidAir)
     {
-        // Either -1, 0 or 1
-        return (processInput) ? playerInput.horizontalDirection : 0;
-    }
-
-    public bool Jump(bool canJumpInAir)
-    {
-        bool canJump = canJumpInAir || (!jumping && (groundCheck.IsGrounded || timeInTheAir <= jumpCallTolerance));
-        if (processInput && canJump)
+        bool canJump = canJumpInMidAir || (!jumping && (groundCheck.IsGrounded || timeInTheAir <= jumpCallTolerance));
+        if (canJump)
         {
             cutJumpShort = false;
             characterJustJumped = true;
@@ -176,7 +143,7 @@ public class CharacterMovement : MonoBehaviour {
 
     private void UpdateHorizontalSpeed(bool grounded, float horizontalInput, float currentInputDirection)
     {
-        bool pressingDirection = horizontalInput != 0 && !playerInput.lockAim;
+        bool pressingDirection = horizontalInput != 0;
         bool moving = currentHorizontalSpeed != 0;
         if (moving && !pressingDirection)
         {
@@ -220,7 +187,7 @@ public class CharacterMovement : MonoBehaviour {
     private void ProcessJumpInput()
     {
         // Cut the jump the moment the player stops holding the button
-        if (!processInput || !playerInput.holdingJump)
+        if (!holdingJump)
         {
             cutJumpShort = true;
         }
@@ -273,57 +240,14 @@ public class CharacterMovement : MonoBehaviour {
 
     private void UpdatePosition()
     {
-        if (!freezeMovement)
-        {
-            tmpVector2.Set(currentHorizontalSpeed, currentVerticalSpeed);
-            characterController.Move(tmpVector2);
-        } else
-        {
-            currentHorizontalSpeed = 0;
-            currentVerticalSpeed = 0;
-        }
+        tmpVector2.Set(currentHorizontalSpeed, currentVerticalSpeed);
+        characterController.Move(tmpVector2);
     }
 
-    private void UpdateRotation(float currentInputDirection)
+    public void SetSpeed(float x, float y)
     {
-        Vector3 forward = transform.forward;
-        // Start a new rotation only if the direction input has changed
-        if (currentInputDirection != facingDirection)
-        {
-            if (flipingMethod == FlipingMethod.Rotation)
-            {
-                // First calculate the currentRotationTime instead of setting it 
-                // straight to 0 in case the character was already rotating when 
-                // the controller changed direction.
-                float delta = (forward.z + 1) / 2;
-                if (currentInputDirection < 0)
-                {
-                    delta = 1 - delta;
-                }
-                currentRotationTime = timeToFlipFacingDirection * delta;
-                rotating = true;
-                tmpVector3.Set(0, 0, -currentInputDirection);
-                fromRotation = Quaternion.LookRotation(tmpVector3);
-                tmpVector3.Set(0, 0, currentInputDirection);
-                toRotation = Quaternion.LookRotation(tmpVector3);
-            } else if (flipingMethod == FlipingMethod.Mirror)
-            {
-                // For horizontal mirroring just change the sign of the Z value in the scale
-                tmpVector3.Set(originalScale.x, originalScale.y, originalScale.z * currentInputDirection);
-                transform.localScale = tmpVector3;
-            }
-        }
-        if (rotating)
-        {
-            // Lerp between original and new rotation
-            currentRotationTime += Time.fixedDeltaTime;
-            float delta = currentRotationTime / timeToFlipFacingDirection;
-            transform.rotation = Quaternion.Slerp(fromRotation, toRotation, delta) * originalRotation;
-            if (currentRotationTime >= timeToFlipFacingDirection)
-            {
-                rotating = false;
-            }
-        }
+        currentHorizontalSpeed = x;
+        currentVerticalSpeed = y;
     }
 
     /// <summary>
@@ -335,11 +259,6 @@ public class CharacterMovement : MonoBehaviour {
     {
         currentHorizontalSpeed = x;
         currentVerticalSpeed = y;
-    }
-
-    public float FacingDirection
-    {
-        get { return facingDirection; }
     }
 
     public bool IsMoving

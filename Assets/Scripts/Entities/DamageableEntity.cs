@@ -42,6 +42,11 @@ public class DamageableEntity : MonoBehaviour
         currentLife = life;
     }
 
+    public float CurrentLife
+    {
+        get { return currentLife; }
+    }
+
     public float Life
     {
         get

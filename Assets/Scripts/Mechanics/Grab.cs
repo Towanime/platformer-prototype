@@ -34,8 +34,7 @@ public class Grab : MonoBehaviour
     public Vector3 grabRotationOffset;
     [Tooltip("Renderer of the rooted arm in the model, it'll be disabled when doing a grab")]
     public Renderer originalArmRenderer;
-    public SimplePlayerController controller;
-    public CharacterMovement characterMovement;
+    public AimingDirectionResolver aimingDirectionResolver;
     public Animator animator;
     public bool isEnabled = true;
     // has been thrown? is it returning?
@@ -143,7 +142,7 @@ public class Grab : MonoBehaviour
 
         // setup target for the arm
         Vector3 targetPosition = armAnchor.transform.position;
-        targetPosition.x += distance * characterMovement.FacingDirection;
+        targetPosition.x += distance * aimingDirectionResolver.FacingDirection;
         armTarget.transform.position = targetPosition;
 
         // enable grab trigger!
@@ -171,7 +170,6 @@ public class Grab : MonoBehaviour
         // clean up and renable the controller
         animationEnded = false;
         startTime = 0;
-        controller.IsEnabled = true;
         // begin cooldown
         waitCooldown = true;
         currentCooldown = 0;

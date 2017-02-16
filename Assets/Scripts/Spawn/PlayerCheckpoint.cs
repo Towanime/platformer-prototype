@@ -11,21 +11,9 @@ public class PlayerCheckpoint : MonoBehaviour
     public Transform checkpoint;
     [Tooltip("Dark lord game object.")]
     public GameObject player;
-    [Tooltip("Global player input component, used to disable player input when they die.")]
-    public PlayerInput input;
-    [Tooltip("Camera controller, this component will target a dummy when the player falls into a pit.")]
-    public CameraController cameraController;
     [Tooltip("How many seconds it will take to spawn the player in the last checkpoint.")]
     public float spawnTime;
-    /// <summary>
-    /// Temporal game object for the camera to target when a player touches a pit only.
-    /// </summary>
-    private GameObject pitTargetDummy;
-
-    void Start()
-    {
-        pitTargetDummy = new GameObject();
-    }
+    public bool spawning;
 
     public void OnTriggerEnter(Collider other)
     {
@@ -35,11 +23,14 @@ public class PlayerCheckpoint : MonoBehaviour
             checkpoint = other.transform.Find("Spawn");
         } else if (other.CompareTag("Pit"))
         {
-            pitTargetDummy.transform.position = transform.position;
-            cameraController.target = pitTargetDummy;
-            input.enabled = false;
-            Invoke("Spawn", spawnTime);
+            player.GetComponent<ActionStateMachine>().OnFall();
         }
+    }
+
+    public void BeginSpawn()
+    {
+        spawning = true;
+        Invoke("Spawn", spawnTime);
     }
 
     /// <summary>
@@ -47,8 +38,12 @@ public class PlayerCheckpoint : MonoBehaviour
     /// </summary>
     public void Spawn()
     {
-        cameraController.target = player;
         player.transform.position = checkpoint != null ? checkpoint.transform.position : new Vector3(0, 1, 0);
-        input.enabled = true;
+        spawning = false;
+    }
+
+    public bool IsSpawning
+    {
+        get { return spawning; }
     }
 }
