@@ -11,6 +11,7 @@ public class SoundManager : MonoBehaviour {
     public AudioClip overheatSound;
     public AudioClip coinPickupSound;
     public AudioClip bulletSpawnSound;
+    public AudioClip souldPickupSound;
 
     private Dictionary<GameObject, AudioSource> soundsBeingPlayed = new Dictionary<GameObject, AudioSource>();
     private List<GameObject> pooledObjectsToRelease = new List<GameObject>();

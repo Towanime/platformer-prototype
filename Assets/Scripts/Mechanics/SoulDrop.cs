@@ -32,6 +32,7 @@ public class SoulDrop : MonoBehaviour {
         // if it's the player then release it!
         if (other.CompareTag("Player") && collectable)
         {
+            SoundManager.Instance.StopAndPlay(SoundManager.Instance.souldPickupSound);
             wasCollected = true;
             Destroy();
         }
