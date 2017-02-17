@@ -15,8 +15,10 @@ public class Grab : MonoBehaviour
     public float grabCooldown = 0.1f;
     [Tooltip("Force applied when throwing an enemy.")]
     public float throwSpeed = 12f;
-    [Tooltip("Time that the enemy will spend in the air after being thrown and before dissapearing.")]
+    [Tooltip("Time that the enemy will spend traveling unitl reaching 0 speed.")]
     public float throwEnemyTravelTime = 2f;
+    [Tooltip("Time that the enemy will spend in the air before dissapearing. Usually the same as throwEnemyTravelTime")]
+    public float throwDeathTime = 2f;
     [Tooltip("Speed curve of the enemy throw.")]
     public AnimationCurve throwSpeedCurve;
     // arm needs a rigid body and colission
@@ -202,7 +204,7 @@ public class Grab : MonoBehaviour
         ThrowBehavior grababbleEntity = grabbedEnemy.GetComponent<ThrowBehavior>();
         // Reset Z position to 0 before throwing?
         grababbleEntity.transform.position = origin;
-        grababbleEntity.BeginThrow(aimingDirection, throwSpeed, throwEnemyTravelTime, throwSpeedCurve);
+        grababbleEntity.BeginThrow(aimingDirection, throwSpeed, throwEnemyTravelTime, throwDeathTime, throwSpeedCurve);
         grabbedEnemy.transform.parent = null;
         grabbedEnemy = null;
         End();

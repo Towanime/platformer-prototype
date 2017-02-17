@@ -23,6 +23,16 @@ public class EnemyDamageableEntity : DamageableEntity {
 
     }
 
+    public override bool OnDamage(GameObject origin, float damage)
+    {
+        bool damaged = base.OnDamage(origin, damage);
+        if (damaged)
+        {
+            gameObject.SendMessage("OnDamageApplied");
+        }
+        return damaged;
+    }
+
     protected override void OnDeath()
     {
         // drop soul if it has to
