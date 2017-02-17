@@ -28,7 +28,7 @@ public class EnemyDamageableEntity : DamageableEntity {
         bool damaged = base.OnDamage(origin, damage);
         if (damaged)
         {
-            gameObject.SendMessage("OnDamageApplied");
+            gameObject.SendMessage("OnDamageApplied", SendMessageOptions.DontRequireReceiver);
         }
         return damaged;
     }
