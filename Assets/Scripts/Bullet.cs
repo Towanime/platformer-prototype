@@ -9,11 +9,23 @@ public class Bullet : Hazard
     [Tooltip("Layers that will be ignored by the bullet's collision.")]
     public LayerMask ignoreCollisionMask;
     private Vector2 direction;
+    private Vector3 tmp;
 
-    // Update is called once per frame
     void Update()
     {
-        transform.Translate(speed * Time.deltaTime * direction.x, speed * Time.deltaTime * direction.y, 0, Space.World);
+        // Set desired travel speed
+        tmp.Set(speed * Time.deltaTime * direction.x, speed * Time.deltaTime * direction.y, 0);
+        // Do a raycast to see if anything will be hit between the current and the next position
+        int collidableLayer = ~ignoreCollisionMask.value;
+        RaycastHit hitInfo;
+        bool hit = Physics.Raycast(transform.position, tmp, out hitInfo, tmp.magnitude, collidableLayer);
+        if (hit)
+        {
+            // If there's a hit, reduce the travel distance to match the position of the hit object
+            // This is done to avoid traversing objects that are too close to the bullet
+            tmp = Vector3.ClampMagnitude(tmp, hitInfo.distance);
+        }
+        transform.Translate(tmp, Space.World);
     }
 
     void OnEnable()
