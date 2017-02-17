@@ -15,9 +15,12 @@ public class Teleport : MonoBehaviour {
     public float floatingTime = 1f;
     public AimingDirectionResolver aimingDirectionResolver;
     public Animator animator;
+    [Tooltip("Only target souls found in the direction the player is looking at.")]
     public bool onlyTargetForward = true;
-    public float soulOutlineWidth = 1f;
-
+    [Tooltip("Width of the soul when it's being targetted.")]
+    public float soulOutlineWidth = 3f;
+    [Tooltip("Minimum distance between the player and the soul that is needed for it to be targetable.")]
+    public float minDistanceToDetect = 0.2f;
     private float currentTimeFloating = 0;
     private bool dummyEnabled;
     private Vector3 tmp;
@@ -109,8 +112,9 @@ public class Teleport : MonoBehaviour {
             float xDiff = soulPosition.x - currentPosition.x;
             bool playerIsFacingSoul = xDiff == 0 || Mathf.Sign(xDiff) == aimingDirectionResolver.FacingDirection;
             float distance = Vector2.Distance(currentPosition, soulPosition);
+            bool inRange = distance >= minDistanceToDetect;
             // Only if the player is facing the soul
-            if ((!onlyTargetForward || playerIsFacingSoul) && (nearestSoul == null || distance < minDistance))
+            if ((!onlyTargetForward || playerIsFacingSoul) && (nearestSoul == null || distance < minDistance) && inRange)
             {
                 nearestSoul = soulObject;
                 minDistance = distance;

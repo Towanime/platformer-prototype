@@ -11,7 +11,10 @@ public delegate void SoulDestroyEventHandler(GameObject sender, bool playerColle
 
 public class SoulDrop : MonoBehaviour {
 
+    [Tooltip("Time in seconds that the soul will be alive, if set to 0 the soul won't dissapear until collected.")]
     public float lifeSpan = 10;
+    [Tooltip("If the soul can be collected by the player or not.")]
+    public bool collectable = true;
     /// <summary>
     /// Subscribe to this to know when a souls dissapears by collection or time running out.
     /// </summary>
@@ -27,7 +30,7 @@ public class SoulDrop : MonoBehaviour {
     public void OnTriggerEnter(Collider other)
     {
         // if it's the player then release it!
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && collectable)
         {
             wasCollected = true;
             Destroy();
@@ -42,7 +45,10 @@ public class SoulDrop : MonoBehaviour {
     void OnEnable()
     {
         wasCollected = false;
-        Invoke("Destroy", lifeSpan);
+        if (lifeSpan > 0)
+        {
+            Invoke("Destroy", lifeSpan);
+        }
     }
 
     void OnDisable()
