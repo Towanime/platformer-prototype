@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class Trigger : MonoBehaviour {
+public class TargettedTrigger : MonoBehaviour {
 
     /**
      * List to hold activators to call when this switch is "activated".
@@ -16,7 +16,7 @@ public class Trigger : MonoBehaviour {
         {
             foreach (BaseActivator activator in activators)
             {
-                activator.Activate(gameObject);
+                activator.Activate(other.gameObject);
             }
         }
     }
