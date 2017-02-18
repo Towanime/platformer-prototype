@@ -6,6 +6,9 @@ using System.Collections;
 /// </summary>
 public class ThrowBehavior : MonoBehaviour {
 
+    [Tooltip("Optional, will be enabled once the throw begins.")]
+    public DeathOnContact deathOnContact;
+
     private bool beingThrown;
     private float elapsedTravelTime;
     private float throwTravelTime;
@@ -62,6 +65,9 @@ public class ThrowBehavior : MonoBehaviour {
         beingThrown = true;
         elapsedTravelTime = 0;
         elapsedDeathTime = 0;
+        if (deathOnContact != null) {
+            deathOnContact.isEnabled = true;
+        }
     }
 
     void OnDamageApplied()
