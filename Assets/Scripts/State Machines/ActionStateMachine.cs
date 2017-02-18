@@ -19,7 +19,6 @@ public class ActionStateMachine : MonoBehaviour {
     private StateMachine<VulnerabilityStates> vulnerabilityStateMachine;
     private StateMachine<MovementStates> movementStateMachine;
     private StateMachine<AimStates> aimStateMachine;
-    private bool holdingEnemy;
     private GameObject damageOrigin;
     private PlayerCheckpoint playerCheckpoint;
 
@@ -42,7 +41,7 @@ public class ActionStateMachine : MonoBehaviour {
     void Idle_Update()
     {
         // In idle the player can do every action
-        if (playerInput.shooting && !holdingEnemy)
+        if (playerInput.shooting && !grabSkill.IsHolding && CanUseOffensiveAbilities())
         {
             actionStateMachine.ChangeState(ActionStates.Shooting);
         }
@@ -50,11 +49,11 @@ public class ActionStateMachine : MonoBehaviour {
         {
             actionStateMachine.ChangeState(ActionStates.Teleporting);
         }
-        if (playerInput.grabbed && !holdingEnemy)
+        if (playerInput.grabbed && !grabSkill.IsHolding && CanUseOffensiveAbilities())
         {
-            actionStateMachine.ChangeState(ActionStates.Grabbing);
+            actionStateMachine.ChangeState(ActionStates.GrabStarted);
         }
-        if (playerInput.threw && holdingEnemy)
+        if (playerInput.threw && grabSkill.IsHolding)
         {
             Throw();
         }
@@ -64,24 +63,24 @@ public class ActionStateMachine : MonoBehaviour {
         }
     }
 
-    void Grabbing_Enter()
+    void GrabStarted_Enter()
     {
         bool begun = grabSkill.Begin();
         if (begun)
         {
             movementStateMachine.ChangeState(MovementStates.Frozen);
             aimStateMachine.ChangeState(AimStates.Disabled);
+            actionStateMachine.ChangeState(ActionStates.GrabRunning);
         } else
         {
             actionStateMachine.ChangeState(actionStateMachine.LastState);
         }
     }
 
-    void Grabbing_Update()
+    void GrabRunning_Update()
     {
         if (!grabSkill.IsRunning)
         {
-            holdingEnemy = grabSkill.IsHolding;
             actionStateMachine.ChangeState(ActionStates.Idle);
         }
     }
@@ -120,7 +119,7 @@ public class ActionStateMachine : MonoBehaviour {
         }
         if (playerInput.grabbed)
         {
-            actionStateMachine.ChangeState(ActionStates.Grabbing);
+            actionStateMachine.ChangeState(ActionStates.GrabStarted);
         }
         // Revert back to idle once he stops shooting
         if (!playerInput.shooting)
@@ -170,7 +169,7 @@ public class ActionStateMachine : MonoBehaviour {
         {
             actionStateMachine.ChangeState(ActionStates.Idle);
         }
-        if (playerInput.shooting && !holdingEnemy)
+        if (playerInput.shooting && !grabSkill.IsHolding && CanUseOffensiveAbilities())
         {
             actionStateMachine.ChangeState(ActionStates.Shooting);
         }
@@ -178,15 +177,15 @@ public class ActionStateMachine : MonoBehaviour {
         {
             actionStateMachine.ChangeState(ActionStates.Teleporting);
         }
-        if (playerInput.grabbed && !holdingEnemy)
+        if (playerInput.grabbed && !grabSkill.IsHolding && CanUseOffensiveAbilities())
         {
-            actionStateMachine.ChangeState(ActionStates.Grabbing);
+            actionStateMachine.ChangeState(ActionStates.GrabStarted);
         }
         if (playerInput.jumped)
         {
             actionStateMachine.ChangeState(ActionStates.Jumping);
         }
-        if (playerInput.threw && holdingEnemy)
+        if (playerInput.threw && grabSkill.IsHolding)
         {
             Throw();
         }
@@ -215,7 +214,13 @@ public class ActionStateMachine : MonoBehaviour {
         bool finished = playerHealth.UpdateKnockback();
         if (finished)
         {
-            actionStateMachine.ChangeState(ActionStates.Idle);
+            if (grabSkill.IsRunning)
+            {
+                actionStateMachine.ChangeState(ActionStates.GrabRunning);
+            } else
+            {
+                actionStateMachine.ChangeState(ActionStates.Idle);
+            }
         }
     }
 
@@ -271,11 +276,16 @@ public class ActionStateMachine : MonoBehaviour {
         actionStateMachine.ChangeState(nextState);
     }
 
+    private bool CanUseOffensiveAbilities()
+    {
+        return vulnerabilityStateMachine.State != VulnerabilityStates.Invulnerable;
+    }
+
     private void Throw()
     {
         Vector2 aimingDirection = aimingDirectionResolver.GetAimingDirection(IsGrounded);
         Vector3 throwOriginPosition = aimingDirectionResolver.GetAimEmitorPosition(aimingDirection);
-        holdingEnemy = !grabSkill.ThrowEnemy(aimingDirection, throwOriginPosition);
+        grabSkill.ThrowEnemy(aimingDirection, throwOriginPosition);
     }
 
     private bool IsGrounded

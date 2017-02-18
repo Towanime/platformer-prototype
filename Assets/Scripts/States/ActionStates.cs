@@ -12,7 +12,8 @@ public enum ActionStates {
     // Floating in the air for some time after a teleport
     Floating,
     // Arm is flying forward/coming back
-    Grabbing,
+    GrabStarted,
+    GrabRunning,
     Jumping,
     // Received damage and knockback
     Damaged,

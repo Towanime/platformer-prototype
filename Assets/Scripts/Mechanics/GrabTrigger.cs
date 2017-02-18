@@ -23,7 +23,6 @@ public class GrabTrigger : MonoBehaviour
         if (other.CompareTag("Grab Hazard"))
         {
             player.OnDamage(other.gameObject, 1);
-            return;
         }
         grabComponent.OnCollision(other);
     }
