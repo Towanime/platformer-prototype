@@ -139,6 +139,7 @@ public class ActionStateMachine : MonoBehaviour {
         bool begun = teleport.BeginTeleport();
         if (begun)
         {
+            teleport.StartShadowWalkEffect();
             movementStateMachine.ChangeState(MovementStates.Frozen);
             aimStateMachine.ChangeState(AimStates.Disabled);
         } else
@@ -159,6 +160,7 @@ public class ActionStateMachine : MonoBehaviour {
     void Floating_Enter()
     {
         teleport.BeginFloating();
+        teleport.StopShadowWalkEffect(true);
         movementStateMachine.ChangeState(MovementStates.Frozen);
         aimStateMachine.ChangeState(AimStates.Enabled);
     }
@@ -198,6 +200,11 @@ public class ActionStateMachine : MonoBehaviour {
         {
             actionStateMachine.ChangeState(ActionStates.Idle);
         }
+    }
+
+    void Floating_Exit()
+    {
+        teleport.StopShadowWalkEffect(false);
     }
 
     void Damaged_Enter()

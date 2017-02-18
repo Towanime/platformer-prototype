@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Teleport : MonoBehaviour {
 
+    public GameObject shadowWalkEffect;
     [Tooltip("Area that contains the souls nearby.")]
     public TeleportTriggerArea teleportTriggerArea;
     [Tooltip("Object with the same dimentions as the player that is used to readjust the position of the teleport.")]
@@ -26,9 +27,85 @@ public class Teleport : MonoBehaviour {
     private Vector3 tmp;
     private GameObject nearestSoul;
 
+    [Tooltip("Time before the particles are turned off after the teleport is finished.")]
+    public float timeBeforeStoppingParticles = 1f;
+    [Tooltip("Time before the trails are turned off after the teleport is finished.")]
+    public float timeBeforeHiddingTrails = 0.15f;
+    private ParticleSystem particleSystem;
+    private TrailRenderer[] trailRenderers;
+    /// <summary>
+    /// Exact time when the teleport ended
+    /// </summary>
+    private float timeWhenTeleportEnded;
+    private bool timerStartedToHideParticles;
+    private bool timerStartedToHideTrails;
+
+    void Start()
+    {
+        particleSystem = shadowWalkEffect.GetComponentInChildren<ParticleSystem>();
+        trailRenderers = shadowWalkEffect.GetComponentsInChildren<TrailRenderer>();
+    }
+
+    void Update()
+    {
+        UpdateParticleSystem();
+        UpdateTrailRenderer();
+    }
+
     void FixedUpdate()
     {
         UpdateNearestSoul();
+    }
+
+    void UpdateParticleSystem()
+    {
+        if (timerStartedToHideParticles)
+        {
+            if (Time.time - timeWhenTeleportEnded >= timeBeforeStoppingParticles)
+            {
+                TurnOffParticles();
+            }
+        }
+    }
+
+    void UpdateTrailRenderer()
+    {
+        if (timerStartedToHideTrails)
+        {
+            if (Time.time - timeWhenTeleportEnded >= timeBeforeHiddingTrails)
+            {
+                TurnOffTrails();
+            }
+        }
+    }
+
+    void TurnOffParticles()
+    {
+        particleSystem.Stop();
+        timerStartedToHideParticles = false;
+    }
+
+    void TurnOffTrails()
+    {
+        foreach (TrailRenderer trailRenderer in trailRenderers)
+        {
+            trailRenderer.enabled = false;
+        }
+        timerStartedToHideTrails = false;
+    }
+
+    public void StopShadowWalkEffect(bool withTimer)
+    {
+        if (withTimer)
+        {
+            timeWhenTeleportEnded = Time.time;
+            timerStartedToHideParticles = true;
+            timerStartedToHideTrails = true;
+        } else
+        {
+            TurnOffParticles();
+            TurnOffTrails();
+        }
     }
 
     private void UpdateNearestSoul()
@@ -72,10 +149,23 @@ public class Teleport : MonoBehaviour {
             // Set the dummy to the position of the soul so that we can use 
             // the position after the collision adjustements have been done
             UpdateDummyPosition(nearestSoul.transform.position);
-            animator.SetTrigger("ShadowWalk");
             return true;
         }
         return false;
+    }
+
+    public void StartShadowWalkEffect()
+    {
+        shadowWalkEffect.transform.rotation = Quaternion.LookRotation(nearestSoul.transform.position - transform.position);
+        shadowWalkEffect.SetActive(true);
+        particleSystem.Play();
+        foreach (TrailRenderer trailRenderer in trailRenderers)
+        {
+            trailRenderer.enabled = true;
+        }
+        timerStartedToHideParticles = false;
+        timerStartedToHideTrails = false;
+        animator.SetTrigger("ShadowWalk");
     }
 
     public bool UpdateTeleport()
