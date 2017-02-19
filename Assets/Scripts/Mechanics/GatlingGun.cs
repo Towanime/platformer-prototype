@@ -25,6 +25,12 @@ public class GatlingGun : MonoBehaviour {
     public Text lblTemp;
     [Tooltip("Object that contains the physical gun.")]
     public GameObject gatlingGunObject;
+    [Tooltip("At which point of the overheat state will the laugh sound be played. 0 means the sound won't play and 1 full overheat.")]
+    [Range(0.0f, 1.0f)]
+    public float overheatLaughSoundPosition = 0.8f;
+    [Tooltip("At which point of the overheat state will the kettle boiling sound be played. 0 means the sound won't play and 1 full overheat.")]
+    [Range(0.0f, 1.0f)]
+    public float overheatKettleSoundPosition = 0.7f;
     // cooldown vars
     private float currentCooldown;
     private bool wait;
@@ -53,21 +59,50 @@ public class GatlingGun : MonoBehaviour {
         }
         // Update the overheat counter, go up if firing the gun and down if not firing it.
         float overheatModifier = Time.fixedDeltaTime * (isFiringGun ? 1 : -recoverRate);
-        currentOverheat = Mathf.Clamp(currentOverheat + overheatModifier, 0, overheatLimit);
+        float newOverheat = Mathf.Clamp(currentOverheat + overheatModifier, 0, overheatLimit);
         // Update the isOverheated value
-        if (currentOverheat <= 0)
+        if (newOverheat <= 0)
         {
             isOverheated = false;
-            SoundManager.Instance.Stop(SoundManager.Instance.overheatSound);
+            OnOverheatChange(isOverheated);
         }
-        if (currentOverheat >= overheatLimit)
+        if (newOverheat >= overheatLimit)
         {
             isOverheated = true;
-            SoundManager.Instance.Play(SoundManager.Instance.overheatSound);
+            OnOverheatChange(isOverheated);
         }
+        PlayOverheatSound(currentOverheat, newOverheat, overheatLaughSoundPosition, SoundManager.Instance.overheatLaughSound);
+        PlayOverheatSound(currentOverheat, newOverheat, overheatKettleSoundPosition, SoundManager.Instance.overheatKettleSound);
+        currentOverheat = newOverheat;
         UpdateLabel();
         lastFiringGun = isFiringGun;
         isFiringGun = false;
+    }
+
+    void OnOverheatChange(bool isOverheated)
+    {
+        if (isOverheated)
+        {
+            SoundManager.Instance.Play(SoundManager.Instance.overheatCoolDownSound);
+            SoundManager.Instance.Play(SoundManager.Instance.reachedOverheatSound);
+        } else
+        {
+            SoundManager.Instance.Stop(SoundManager.Instance.overheatCoolDownSound);
+            SoundManager.Instance.Stop(SoundManager.Instance.reachedOverheatSound);
+            SoundManager.Instance.Stop(SoundManager.Instance.overheatLaughSound);
+            SoundManager.Instance.Stop(SoundManager.Instance.overheatKettleSound);
+        }
+    }
+
+    void PlayOverheatSound(float currentOverheat, float newOverheat, float soundPosition, AudioClipInfo audioClipInfo)
+    {
+        if (soundPosition == 0) return;
+        float currentOverheatPercentage = currentOverheat / overheatLimit;
+        float newOverheatPercentage = newOverheat / overheatLimit;
+        if (isOverheated && currentOverheatPercentage >= soundPosition && newOverheatPercentage <= soundPosition)
+        {
+            SoundManager.Instance.Play(audioClipInfo);
+        }
     }
 
     /// <summary>
