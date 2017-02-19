@@ -8,4 +8,9 @@ public class CastleGateAnimation : MonoBehaviour {
     {
         SoundManager.Instance.Play(SoundManager.Instance.castleGateSound);
     }
+
+    void ChainsSound()
+    {
+        SoundManager.Instance.Play(SoundManager.Instance.castleGateChainsSound);
+    }
 }
