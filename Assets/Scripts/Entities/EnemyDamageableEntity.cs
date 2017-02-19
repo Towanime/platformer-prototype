@@ -10,6 +10,7 @@ public class EnemyDamageableEntity : DamageableEntity {
     [Tooltip("Game object that has a component that implements the ISpawnPoint interface.")]
     public GameObject spawnPoint;
     public bool dropSoul;
+    public bool permanentSoul;
     public ISpawnPoint spawn;
 
     void Start()
@@ -40,11 +41,17 @@ public class EnemyDamageableEntity : DamageableEntity {
         {
             GameObject soul = SoulPool.instance.GetObject();
             soul.transform.position = transform.position;
+            SoulDrop soulDrop = soul.GetComponent<SoulDrop>();
             // set the spawn point if any
             if (spawn != null)
             {
-                SoulDrop soulDrop = soul.GetComponent<SoulDrop>();
                 soulDrop.Initialize(spawn);
+            }
+            // is it permanent?
+            if (permanentSoul)
+            {
+                soulDrop.collectable = false;
+                soulDrop.lifeSpan = 0;
             }
             soul.SetActive(true);
         } else if (spawn != null) // check if it should respawn
