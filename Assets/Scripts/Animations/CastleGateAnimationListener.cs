@@ -11,6 +11,6 @@ public class CastleGateAnimationListener : MonoBehaviour {
 
     void ChainsSound()
     {
-        SoundManager.Instance.Play(SoundManager.Instance.castleGateChainsSound);
+        //SoundManager.Instance.Play(SoundManager.Instance.castleGateChainsSound);
     }
 }

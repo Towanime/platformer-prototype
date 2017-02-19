@@ -22,6 +22,8 @@ public class ActionStateMachine : MonoBehaviour {
     private GameObject damageOrigin;
     private PlayerCheckpoint playerCheckpoint;
 
+    private int gameOverCount;
+
     // Use this for initialization
     void Start() {
         vulnerabilityStateMachine = GetComponent<VulnerabilityStateMachine>().StateMachine;
@@ -275,6 +277,7 @@ public class ActionStateMachine : MonoBehaviour {
 
     void Death_Enter()
     {
+        gameOverCount++;
         playerHealth.Refresh();
         actionStateMachine.ChangeState(ActionStates.Spawning);
     }
