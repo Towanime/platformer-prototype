@@ -24,6 +24,7 @@ public class SoundManager : MonoBehaviour {
     public AudioClipInfo soulPickupSound;
     public AudioClipInfo shadowWalkSound;
     public AudioClipInfo catDeathSound;
+    public AudioClipInfo castleGateSound;
 
     private Dictionary<GameObject, AudioSource> soundsBeingPlayed = new Dictionary<GameObject, AudioSource>();
     private List<GameObject> pooledObjectsToRelease = new List<GameObject>();
