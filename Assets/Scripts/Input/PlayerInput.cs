@@ -63,7 +63,7 @@ public class PlayerInput : MonoBehaviour {
 
     void SetThrow()
     {
-        threw = Input.GetKeyDown(this.keyboardMouseConfig.throwEnemy) || Input.GetKeyDown(this.windowsGamepadConfig.throwEnemy);
+        threw = GetKeyDown(this.keyboardMouseConfig.throwEnemy) || GetKeyDown(this.windowsGamepadConfig.throwEnemy);
     }
 
     void SetShoot()
@@ -80,5 +80,17 @@ public class PlayerInput : MonoBehaviour {
     void SetLockAim()
     {
         lockAim = Input.GetKey(this.keyboardMouseConfig.lockAim) || Input.GetKey(this.windowsGamepadConfig.lockAim);
+    }
+
+    bool GetKeyDown(KeyCode[] keys)
+    {
+        for (int i = 0; i<keys.Length; i++)
+        {
+            if (Input.GetKeyDown(keys[i]))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }
