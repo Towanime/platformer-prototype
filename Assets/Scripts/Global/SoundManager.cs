@@ -24,6 +24,7 @@ public class SoundManager : MonoBehaviour {
     public AudioClipInfo soulPickupSound;
     public AudioClipInfo shadowWalkSound;
     public AudioClipInfo catDeathSound;
+    public AudioClipInfo catBounceDownSound;
     public AudioClipInfo castleGateSound;
     public AudioClipInfo castleGateChainsSound;
     public AudioClipInfo darkLordFootsteepSound;
