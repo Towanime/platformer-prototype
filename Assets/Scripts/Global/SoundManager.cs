@@ -12,6 +12,7 @@ public class SoundManager : MonoBehaviour {
     public float globalMusicVolume = 1f;
     public AudioClipInfo[] jumpSounds;
     public AudioClipInfo[] avatarPainSounds;
+    public AudioClipInfo[] catPainSounds;
     public AudioClipInfo overheatCoolDownSound;
     public AudioClipInfo overheatLaughSound;
     public AudioClipInfo overheatKettleSound;
