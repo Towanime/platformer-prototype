@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CastleGateAnimation : MonoBehaviour {
+public class CastleGateAnimationListener : MonoBehaviour {
 
 	void DoorSound()
     {
