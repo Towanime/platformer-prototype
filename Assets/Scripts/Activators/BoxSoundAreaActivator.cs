@@ -13,16 +13,26 @@ public class BoxSoundAreaActivator : BaseActivator {
     [Tooltip("Collider of the trigger.")]
     public Collider collider;
     public SoundType soundType;
+    [Tooltip("If the sound will be played once or multiple times depending on a time interval.")]
+    public PlaybackType playbackType = PlaybackType.Once;
+    public float playbackInterval = 10f;
     private float maxVolume;
     /// <summary>
     /// Target that triggered the sound
     /// </summary>
     private GameObject target;
+    private float timeWhenLastPlayed;
 
     public enum SoundType
     {
         Music,
         Sfx
+    }
+
+    public enum PlaybackType
+    {
+        Once,
+        TimeInterval
     }
 
     public enum FadeOffsetSide
@@ -61,19 +71,35 @@ public class BoxSoundAreaActivator : BaseActivator {
         {
             globalVolume = SoundManager.Instance.globalSfxVolume;
         }
-        audioSource.volume = Mathf.Lerp(0, maxVolume, delta) * globalVolume;
+        float volume = Mathf.Lerp(0, maxVolume, delta) * globalVolume;
+        audioSource.volume = volume;
+
+        if (volume > 0 && playbackType == PlaybackType.TimeInterval && Time.time - timeWhenLastPlayed >= playbackInterval)
+        {
+            audioSource.Play();
+            timeWhenLastPlayed = Time.time;
+        }
     }
 
     public override void Activate(GameObject trigger)
     {
-        audioSource.volume = 0;
-        audioSource.Play();
+        if (playbackType == PlaybackType.Once)
+        {
+            audioSource.volume = 0;
+            audioSource.Play();
+        } else if (playbackType == PlaybackType.TimeInterval)
+        {
+            timeWhenLastPlayed = Time.time;
+        }
         target = trigger;
     }
 
     public override void Desactivate()
     {
+        if (playbackType == PlaybackType.Once && audioSource.loop)
+        {
+            audioSource.Pause();
+        }
         target = null;
-        audioSource.Pause();
     }
 }
