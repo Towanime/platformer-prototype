@@ -12,18 +12,29 @@ public class BoxSoundAreaActivator : BaseActivator {
     public AudioSource audioSource;
     [Tooltip("Collider of the trigger.")]
     public Collider collider;
-    [Tooltip("Max volume to play the audio at.")]
-    public float maxVolume = 1;
+    public SoundType soundType;
+    private float maxVolume;
     /// <summary>
     /// Target that triggered the sound
     /// </summary>
     private GameObject target;
+
+    public enum SoundType
+    {
+        Music,
+        Sfx
+    }
 
     public enum FadeOffsetSide
     {
         Left,
         Right,
         Both
+    }
+
+    void Start()
+    {
+        maxVolume = audioSource.volume;
     }
 
     void Update()
@@ -45,7 +56,12 @@ public class BoxSoundAreaActivator : BaseActivator {
                 delta = (collider.bounds.max.x - targetPosition.x) / fadeOffsetPosition;
             }
         }
-        audioSource.volume = Mathf.Lerp(0, maxVolume, delta);
+        float globalVolume = SoundManager.Instance.globalMusicVolume;
+        if (soundType == SoundType.Sfx)
+        {
+            globalVolume = SoundManager.Instance.globalSfxVolume;
+        }
+        audioSource.volume = Mathf.Lerp(0, maxVolume, delta) * globalVolume;
     }
 
     public override void Activate(GameObject trigger)
@@ -58,6 +74,6 @@ public class BoxSoundAreaActivator : BaseActivator {
     public override void Desactivate()
     {
         target = null;
-        audioSource.Stop();
+        audioSource.Pause();
     }
 }

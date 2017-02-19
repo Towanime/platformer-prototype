@@ -41,19 +41,19 @@ public class ActionStateMachine : MonoBehaviour {
     void Idle_Update()
     {
         // In idle the player can do every action
-        if (playerInput.shooting && !grabSkill.IsHolding && CanUseOffensiveAbilities())
+        if (playerInput.shooting)
         {
             actionStateMachine.ChangeState(ActionStates.Shooting);
         }
-        if (playerInput.teleported && teleport.HasTarget)
+        if (playerInput.teleported)
         {
             actionStateMachine.ChangeState(ActionStates.Teleporting);
         }
-        if (playerInput.grabbed && !grabSkill.IsHolding && CanUseOffensiveAbilities())
+        if (playerInput.grabbed)
         {
             actionStateMachine.ChangeState(ActionStates.GrabStarted);
         }
-        if (playerInput.threw && grabSkill.IsHolding)
+        if (playerInput.threw)
         {
             Throw();
         }
@@ -65,13 +65,18 @@ public class ActionStateMachine : MonoBehaviour {
 
     void GrabStarted_Enter()
     {
-        bool begun = grabSkill.Begin();
-        if (begun)
+        bool begun = false;
+        if (!grabSkill.IsHolding && CanUseOffensiveAbilities())
         {
-            movementStateMachine.ChangeState(MovementStates.Frozen);
-            aimStateMachine.ChangeState(AimStates.Disabled);
-            actionStateMachine.ChangeState(ActionStates.GrabRunning);
-        } else
+            begun = grabSkill.Begin();
+            if (begun)
+            {
+                movementStateMachine.ChangeState(MovementStates.Frozen);
+                aimStateMachine.ChangeState(AimStates.Disabled);
+                actionStateMachine.ChangeState(ActionStates.GrabRunning);
+            }
+        }
+        if (!begun)
         {
             actionStateMachine.ChangeState(actionStateMachine.LastState);
         }
@@ -99,21 +104,26 @@ public class ActionStateMachine : MonoBehaviour {
 
     void Shooting_Enter()
     {
-        if (gatlingGun.IsEnabled)
+        if (gatlingGun.IsEnabled && !gatlingGun.IsOverheated && !grabSkill.IsHolding && CanUseOffensiveAbilities())
         {
             // Enable movement inputs if he's on the ground but freze movement if the shooting began on air
             MovementStates nextMovementState = IsGrounded ? MovementStates.InputEnabled : MovementStates.Frozen;
             movementStateMachine.ChangeState(nextMovementState);
             aimStateMachine.ChangeState(AimStates.Enabled);
+            SoundManager.Instance.Play(SoundManager.Instance.loadingGunSound);
         } else
         {
-            actionStateMachine.ChangeState(ActionStates.Idle);
+            if (playerInput.startedShooting && gatlingGun.IsOverheated)
+            {
+                SoundManager.Instance.PlayRandom(SoundManager.Instance.fireWhenOverheatSounds);
+            }
+            actionStateMachine.ChangeState(actionStateMachine.LastState);
         }
     }
 
     void Shooting_Update()
     {
-        if (playerInput.teleported && teleport.HasTarget)
+        if (playerInput.teleported)
         {
             actionStateMachine.ChangeState(ActionStates.Teleporting);
         }
@@ -122,7 +132,7 @@ public class ActionStateMachine : MonoBehaviour {
             actionStateMachine.ChangeState(ActionStates.GrabStarted);
         }
         // Revert back to idle once he stops shooting
-        if (!playerInput.shooting)
+        if (!playerInput.shooting || gatlingGun.IsOverheated)
         {
             actionStateMachine.ChangeState(ActionStates.Idle);
         }
@@ -136,13 +146,19 @@ public class ActionStateMachine : MonoBehaviour {
 
     void Teleporting_Enter()
     {
-        bool begun = teleport.BeginTeleport();
-        if (begun)
+        bool begun = false;
+        if (teleport.HasTarget)
         {
-            teleport.StartShadowWalkEffect();
-            movementStateMachine.ChangeState(MovementStates.Frozen);
-            aimStateMachine.ChangeState(AimStates.Disabled);
-        } else
+            begun = teleport.BeginTeleport();
+            if (begun)
+            {
+                teleport.StartShadowWalkEffect();
+                SoundManager.Instance.StopAndPlay(SoundManager.Instance.shadowWalkSound);
+                movementStateMachine.ChangeState(MovementStates.Frozen);
+                aimStateMachine.ChangeState(AimStates.Disabled);
+            }
+        }
+        if (!begun)
         {
             actionStateMachine.ChangeState(actionStateMachine.LastState);
         }
@@ -153,14 +169,19 @@ public class ActionStateMachine : MonoBehaviour {
         bool finished = teleport.UpdateTeleport();
         if (finished)
         {
-            actionStateMachine.ChangeState(ActionStates.Floating);
+            actionStateMachine.ChangeState(ActionStates.FloatingStarted);
         }
+    }
+
+    void FloatingStarted_Enter()
+    {
+        teleport.BeginFloating();
+        teleport.StopShadowWalkEffect(true);
+        actionStateMachine.ChangeState(ActionStates.Floating);
     }
 
     void Floating_Enter()
     {
-        teleport.BeginFloating();
-        teleport.StopShadowWalkEffect(true);
         movementStateMachine.ChangeState(MovementStates.Frozen);
         aimStateMachine.ChangeState(AimStates.Enabled);
     }
@@ -171,15 +192,15 @@ public class ActionStateMachine : MonoBehaviour {
         {
             actionStateMachine.ChangeState(ActionStates.Idle);
         }
-        if (playerInput.shooting && !grabSkill.IsHolding && CanUseOffensiveAbilities())
+        if (playerInput.shooting)
         {
             actionStateMachine.ChangeState(ActionStates.Shooting);
         }
-        if (playerInput.teleported && teleport.HasTarget)
+        if (playerInput.teleported)
         {
             actionStateMachine.ChangeState(ActionStates.Teleporting);
         }
-        if (playerInput.grabbed && !grabSkill.IsHolding && CanUseOffensiveAbilities())
+        if (playerInput.grabbed)
         {
             actionStateMachine.ChangeState(ActionStates.GrabStarted);
         }
@@ -187,7 +208,7 @@ public class ActionStateMachine : MonoBehaviour {
         {
             actionStateMachine.ChangeState(ActionStates.Jumping);
         }
-        if (playerInput.threw && grabSkill.IsHolding)
+        if (playerInput.threw)
         {
             Throw();
         }
@@ -288,11 +309,16 @@ public class ActionStateMachine : MonoBehaviour {
         return vulnerabilityStateMachine.State != VulnerabilityStates.Invulnerable;
     }
 
-    private void Throw()
+    private bool Throw()
     {
-        Vector2 aimingDirection = aimingDirectionResolver.GetAimingDirection(IsGrounded);
-        Vector3 throwOriginPosition = aimingDirectionResolver.GetAimEmitorPosition(aimingDirection);
-        grabSkill.ThrowEnemy(aimingDirection, throwOriginPosition);
+        bool threw = false;
+        if (grabSkill.IsHolding)
+        {
+            Vector2 aimingDirection = aimingDirectionResolver.GetAimingDirection(IsGrounded);
+            Vector3 throwOriginPosition = aimingDirectionResolver.GetAimEmitorPosition(aimingDirection);
+            threw = grabSkill.ThrowEnemy(aimingDirection, throwOriginPosition);
+        }
+        return threw;
     }
 
     private bool IsGrounded

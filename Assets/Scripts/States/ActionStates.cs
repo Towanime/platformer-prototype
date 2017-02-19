@@ -10,6 +10,7 @@ public enum ActionStates {
     // Teleporting, cannot be attacked or do any other action
     Teleporting,
     // Floating in the air for some time after a teleport
+    FloatingStarted,
     Floating,
     // Arm is flying forward/coming back
     GrabStarted,

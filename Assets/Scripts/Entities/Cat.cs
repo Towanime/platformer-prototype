@@ -48,6 +48,16 @@ public class Cat : EnemyDamageableEntity, ISpawnPoint
         ShowRenderer(false);
     }
 
+    public override bool OnDamage(GameObject origin, float damage)
+    {
+        bool damaged = base.OnDamage(origin, damage);
+        if (damaged && currentLife > 0)
+        {
+            SoundManager.Instance.PlayRandom(SoundManager.Instance.catPainSounds);
+        }
+        return damaged;
+    }
+
     protected override void OnDeath()
     {
         isAlive = false;
@@ -74,6 +84,7 @@ public class Cat : EnemyDamageableEntity, ISpawnPoint
         steamHazard.isActive = true;
         headCollider.enabled = false;
         soulObject.SetActive(true);
+        SoundManager.Instance.Play(SoundManager.Instance.catDeathSound);
     }
 
     private void FinalizeSpawn()
