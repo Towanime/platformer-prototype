@@ -74,6 +74,7 @@ public class Cat : EnemyDamageableEntity, ISpawnPoint
         steamHazard.isActive = true;
         headCollider.enabled = false;
         soulObject.SetActive(true);
+        SoundManager.Instance.Play(SoundManager.Instance.catDeathSound);
     }
 
     private void FinalizeSpawn()

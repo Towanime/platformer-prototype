@@ -6,7 +6,9 @@ public class SoundManager : MonoBehaviour {
 
     public static SoundManager Instance { get { return instance; } }
 
+    [Range(0f, 1f)]
     public float globalSfxVolume = 1f;
+    [Range(0f, 1f)]
     public float globalMusicVolume = 1f;
     public AudioClipInfo[] jumpSounds;
     public AudioClipInfo[] avatarPainSounds;
@@ -19,6 +21,7 @@ public class SoundManager : MonoBehaviour {
     public AudioClipInfo bulletSpawnSound;
     public AudioClipInfo soulPickupSound;
     public AudioClipInfo shadowWalkSound;
+    public AudioClipInfo catDeathSound;
 
     private Dictionary<GameObject, AudioSource> soundsBeingPlayed = new Dictionary<GameObject, AudioSource>();
     private List<GameObject> pooledObjectsToRelease = new List<GameObject>();
