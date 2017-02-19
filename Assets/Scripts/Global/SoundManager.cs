@@ -13,6 +13,7 @@ public class SoundManager : MonoBehaviour {
     public AudioClipInfo[] jumpSounds;
     public AudioClipInfo[] avatarPainSounds;
     public AudioClipInfo[] catPainSounds;
+    public AudioClipInfo[] fireWhenOverheatSounds;
     public AudioClipInfo overheatCoolDownSound;
     public AudioClipInfo overheatLaughSound;
     public AudioClipInfo overheatKettleSound;

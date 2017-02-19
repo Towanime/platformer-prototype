@@ -113,6 +113,10 @@ public class ActionStateMachine : MonoBehaviour {
             SoundManager.Instance.Play(SoundManager.Instance.loadingGunSound);
         } else
         {
+            if (playerInput.startedShooting && gatlingGun.IsOverheated)
+            {
+                SoundManager.Instance.PlayRandom(SoundManager.Instance.fireWhenOverheatSounds);
+            }
             actionStateMachine.ChangeState(actionStateMachine.LastState);
         }
     }
