@@ -41,7 +41,6 @@ public class CameraController : MonoBehaviour {
     public float aimingOffsetY = 1.5f;
 
     private Camera camera;
-    private Vector3 originalCameraPosition;
     /// <summary>
     /// Distance in Z between the camera and the target
     /// </summary>
@@ -66,9 +65,9 @@ public class CameraController : MonoBehaviour {
     void Start ()
     {
         camera = GetComponent<Camera>();
-        originalCameraPosition = transform.position;
         // Get distance in Z between target and camera
-        distanceZ = (target.transform.position - originalCameraPosition).z;
+        distanceZ = (target.transform.position - transform.position).z;
+        UpdateCameraWorldCoordinates();
     }
 	
 	void FixedUpdate ()
