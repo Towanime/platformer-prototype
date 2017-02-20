@@ -13,6 +13,7 @@ public class ActionStateMachine : MonoBehaviour {
     public GatlingGun gatlingGun;
     public Teleport teleport;
     public PlayerHealth playerHealth;
+    [Tooltip("If true certain inputs will be blocked when the character is invulnerable.")]
     public bool blockActionsWhenInvulnerable;
 
     // State machines
