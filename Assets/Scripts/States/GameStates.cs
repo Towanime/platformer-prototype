@@ -4,6 +4,8 @@ using UnityEngine;
 
 public enum GameStates {
 
+    StartScreen,
+    StartScreenToAnimationTransition,
     LevelStartAnimation,
     OpeningEvent,
     PlayingLevel
