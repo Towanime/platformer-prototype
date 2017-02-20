@@ -9,9 +9,12 @@ public class AimingStateMachine : MonoBehaviour {
     public AimingDirectionResolver aimingDirectionResolver;
     private StateMachine<AimStates> stateMachine;
 
-    // Use this for initialization
-    void Awake() {
-        stateMachine = StateMachine<AimStates>.Initialize(this);
+    void Awake()
+    {
+        if (stateMachine == null)
+        {
+            InitStateMachine();
+        }
     }
 
     void Enabled_FixedUpdate()
@@ -26,6 +29,17 @@ public class AimingStateMachine : MonoBehaviour {
 
     public StateMachine<AimStates> StateMachine
     {
-        get { return stateMachine; }
+        get {
+            if (stateMachine == null)
+            {
+                InitStateMachine();
+            }
+            return stateMachine;
+        }
+    }
+
+    void InitStateMachine()
+    {
+        stateMachine = StateMachine<AimStates>.Initialize(this);
     }
 }
