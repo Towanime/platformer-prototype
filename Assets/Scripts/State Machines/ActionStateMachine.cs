@@ -13,6 +13,8 @@ public class ActionStateMachine : MonoBehaviour {
     public GatlingGun gatlingGun;
     public Teleport teleport;
     public PlayerHealth playerHealth;
+    [Tooltip("If true certain inputs will be blocked when the character is invulnerable.")]
+    public bool blockActionsWhenInvulnerable;
 
     // State machines
     private StateMachine<ActionStates> actionStateMachine;
@@ -25,12 +27,18 @@ public class ActionStateMachine : MonoBehaviour {
     private int gameOverCount;
 
     // Use this for initialization
-    void Start() {
+    void Awake() {
         vulnerabilityStateMachine = GetComponent<VulnerabilityStateMachine>().StateMachine;
         movementStateMachine = GetComponent<MovementStateMachine>().StateMachine;
         aimStateMachine = GetComponent<AimingStateMachine>().StateMachine;
         actionStateMachine = StateMachine<ActionStates>.Initialize(this, ActionStates.Idle);
         playerCheckpoint = GetComponentInChildren<PlayerCheckpoint>();
+    }
+
+    void Disabled_Enter()
+    {
+        movementStateMachine.ChangeState(MovementStates.Frozen);
+        aimStateMachine.ChangeState(AimStates.Disabled);
     }
 
     void Idle_Enter()
@@ -309,7 +317,7 @@ public class ActionStateMachine : MonoBehaviour {
 
     private bool CanUseOffensiveAbilities()
     {
-        return vulnerabilityStateMachine.State != VulnerabilityStates.Invulnerable;
+        return !blockActionsWhenInvulnerable || (vulnerabilityStateMachine.State != VulnerabilityStates.Invulnerable);
     }
 
     private bool Throw()
@@ -327,5 +335,10 @@ public class ActionStateMachine : MonoBehaviour {
     private bool IsGrounded
     {
         get { return groundCheck.IsGrounded; }
+    }
+
+    public StateMachine<ActionStates> StateMachine
+    {
+        get { return actionStateMachine; }
     }
 }
