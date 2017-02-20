@@ -25,12 +25,18 @@ public class ActionStateMachine : MonoBehaviour {
     private int gameOverCount;
 
     // Use this for initialization
-    void Start() {
+    void Awake() {
         vulnerabilityStateMachine = GetComponent<VulnerabilityStateMachine>().StateMachine;
         movementStateMachine = GetComponent<MovementStateMachine>().StateMachine;
         aimStateMachine = GetComponent<AimingStateMachine>().StateMachine;
         actionStateMachine = StateMachine<ActionStates>.Initialize(this, ActionStates.Idle);
         playerCheckpoint = GetComponentInChildren<PlayerCheckpoint>();
+    }
+
+    void Disabled_Enter()
+    {
+        movementStateMachine.ChangeState(MovementStates.Frozen);
+        aimStateMachine.ChangeState(AimStates.Disabled);
     }
 
     void Idle_Enter()
@@ -327,5 +333,10 @@ public class ActionStateMachine : MonoBehaviour {
     private bool IsGrounded
     {
         get { return groundCheck.IsGrounded; }
+    }
+
+    public StateMachine<ActionStates> StateMachine
+    {
+        get { return actionStateMachine; }
     }
 }

@@ -19,5 +19,6 @@ public enum ActionStates {
     // Received damage and knockback
     Damaged,
     Spawning,
-    Death
+    Death,
+    Disabled
 }
