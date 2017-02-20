@@ -13,6 +13,7 @@ public class ActionStateMachine : MonoBehaviour {
     public GatlingGun gatlingGun;
     public Teleport teleport;
     public PlayerHealth playerHealth;
+    public bool blockActionsWhenInvulnerable;
 
     // State machines
     private StateMachine<ActionStates> actionStateMachine;
@@ -315,7 +316,7 @@ public class ActionStateMachine : MonoBehaviour {
 
     private bool CanUseOffensiveAbilities()
     {
-        return vulnerabilityStateMachine.State != VulnerabilityStates.Invulnerable;
+        return !blockActionsWhenInvulnerable || (vulnerabilityStateMachine.State != VulnerabilityStates.Invulnerable);
     }
 
     private bool Throw()
