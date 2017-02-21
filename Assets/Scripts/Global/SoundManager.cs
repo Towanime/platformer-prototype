@@ -28,6 +28,7 @@ public class SoundManager : MonoBehaviour {
     public AudioClipInfo castleGateSound;
     public AudioClipInfo castleGateChainsSound;
     public AudioClipInfo darkLordFootsteepSound;
+    public AudioClipInfo lanternHitSound;
 
     private Dictionary<GameObject, AudioSource> soundsBeingPlayed = new Dictionary<GameObject, AudioSource>();
     private List<GameObject> pooledObjectsToRelease = new List<GameObject>();
