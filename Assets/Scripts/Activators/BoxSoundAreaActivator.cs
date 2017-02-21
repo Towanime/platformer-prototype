@@ -16,6 +16,9 @@ public class BoxSoundAreaActivator : BaseActivator {
     [Tooltip("If the sound will be played once or multiple times depending on a time interval.")]
     public PlaybackType playbackType = PlaybackType.Once;
     public float playbackInterval = 10f;
+    public bool modifyBackground;
+    public Color newBackgroundColor = new Color(45, 41, 53);
+    private Color originalColor;
     private float maxVolume;
     /// <summary>
     /// Target that triggered the sound
@@ -44,6 +47,7 @@ public class BoxSoundAreaActivator : BaseActivator {
 
     void Start()
     {
+        originalColor = Camera.main.backgroundColor;
         maxVolume = audioSource.volume;
     }
 
@@ -78,6 +82,10 @@ public class BoxSoundAreaActivator : BaseActivator {
         {
             audioSource.Play();
             timeWhenLastPlayed = Time.time;
+        }
+        if (modifyBackground)
+        {
+            Camera.main.backgroundColor = Color.Lerp(originalColor, newBackgroundColor, delta);
         }
     }
 
