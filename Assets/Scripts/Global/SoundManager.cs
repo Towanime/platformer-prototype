@@ -31,6 +31,7 @@ public class SoundManager : MonoBehaviour {
     public AudioClipInfo darkLordFootsteepSound;
     public AudioClipInfo lanternHitSound;
     public AudioClipInfo gatlingGunPickupSound;
+    public AudioClipInfo startTextBounceSound;
 
     private Dictionary<GameObject, AudioSource> soundsBeingPlayed = new Dictionary<GameObject, AudioSource>();
     private List<GameObject> pooledObjectsToRelease = new List<GameObject>();
