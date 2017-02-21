@@ -22,16 +22,10 @@ public class PlayerHealth : DamageableEntity {
     public float knockbackForceY;
     public CharacterMovement characterMovement;
     public AimingDirectionResolver aimingDirectionResolver;
-    public Text lblTemp;
     private bool renderingEnabled;
     private float elapsedKnockbackTime;
     private float elapsedInvulnerableTime;
     private float elapsedFickerTime;
-
-    void LateUpdate()
-    {
-        UpdateLabel();
-    }
 
     public override bool OnDamage(GameObject origin, float damage)
     {
@@ -112,11 +106,6 @@ public class PlayerHealth : DamageableEntity {
         {
             renderer.enabled = enabled;
         }
-    }
-
-    private void UpdateLabel()
-    {
-        lblTemp.text = "Life: " + currentLife + " / " + life;
     }
 
 }

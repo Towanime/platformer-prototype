@@ -21,8 +21,6 @@ public class GatlingGun : MonoBehaviour {
     [Tooltip("Multiplier for how fast the overheat should recover when not shooting. Ex: if overheatLimit is 6s, a value of 2 will make it recover in 3s.")]
     public float recoverRate = 2;
     public bool isEnabled = true;
-    [Tooltip("Temporal way to show the overheat.")]
-    public Text lblTemp;
     [Tooltip("Object that contains the physical gun.")]
     public GameObject gatlingGunObject;
     [Tooltip("At which point of the overheat state will the laugh sound be played. 0 means the sound won't play and 1 full overheat.")]
@@ -74,7 +72,6 @@ public class GatlingGun : MonoBehaviour {
         PlayOverheatSound(currentOverheat, newOverheat, overheatLaughSoundPosition, SoundManager.Instance.overheatLaughSound);
         PlayOverheatSound(currentOverheat, newOverheat, overheatKettleSoundPosition, SoundManager.Instance.overheatKettleSound);
         currentOverheat = newOverheat;
-        UpdateLabel();
         lastFiringGun = isFiringGun;
         isFiringGun = false;
     }
@@ -160,11 +157,6 @@ public class GatlingGun : MonoBehaviour {
         tmp.x = Mathf.Cos(angle * Mathf.Deg2Rad);
         tmp.y = Mathf.Sin(angle * Mathf.Deg2Rad);
         return tmp;
-    }
-
-    private void UpdateLabel()
-    {
-        lblTemp.text = "Overheat: " + currentOverheat.ToString("0.00") + "s / " + overheatLimit.ToString("0.00") + "s";
     }
 
     public bool IsOverheated
