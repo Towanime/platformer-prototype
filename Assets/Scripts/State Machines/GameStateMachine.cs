@@ -7,33 +7,132 @@ using MonsterLove.StateMachine;
 public class GameStateMachine : MonoBehaviour {
 
     public ActionStateMachine actionStateMachineComponent;
+    [Tooltip("Object that contains the canvas of the main screen.")]
+    public GameObject startScreenCanvas;
     [Tooltip("Object that contains the canvas of the level start animation.")]
     public GameObject levelStartAnimationCanvas;
+    [Tooltip("Object that contains the canvas of the gameplay UI.")]
+    public GameObject gameplayUiCanvas;
     [Tooltip("Castle object in the level.")]
     public GameObject castle;
     [Tooltip("State in which the game will start.")]
-    public GameStates startingState = GameStates.LevelStartAnimation;
+    public GameStates startingState = GameStates.StartScreen;
+    [Tooltip("Fade out time for the start screen graphics.")]
+    public float startScreenAlphaFadeOutTime = 0.15f;
+    [Tooltip("Fade in time for the gameplay sound and music.")]
+    public float startScreenMusicFadeOutTime = 1f;
     [Tooltip("Fade in/out time for the level start animation graphics.")]
     public float levelStartAlphaFadeTime = 0.15f;
     [Tooltip("Fade in time for the gameplay sound and music.")]
     public float gameplaySoundFadeInTime = 2f;
+    [Tooltip("Fade in time for the gameplay ui.")]
+    public float gameplayUiFadeInTime = 0.15f;
+    [Tooltip("Position of the camera when showing the start screen.")]
+    public Transform cameraStartScreenPosition;
+    public AudioSource startScreenMusic;
+    public AudioSource startScreenStartSfx;
     public SoundManager soundManager;
+    public PlayerInput playerInput;
+    public CameraController cameraController;
 
     private StateMachine<ActionStates> actionStateMachine;
     private StateMachine<GameStates> gameStateMachine;
     private float globalMusicVolume;
     private float globalSfxVolume;
     /// <summary>
-    /// Moment in which the level start animation started
+    /// Moment in which the last state change happened
     /// </summary>
-    private float levelStartAnimationTimestamp;
+    private float lastStateChangeTimestamp;
+    /// <summary>
+    /// Moment in which the fade out of the start screen music started
+    /// </summary>
+    private float fadeOutMusicTimestamp;
+    /// <summary>
+    /// Initial volume of the start music
+    /// </summary>
+    private float startMusicVolume;
+    /// <summary>
+    /// If the start screen music is being fade out
+    /// </summary>
+    private bool fadingOutStartMusic;
 
     // Use this for initialization
     void Start () {
         globalMusicVolume = soundManager.globalMusicVolume;
         globalSfxVolume = soundManager.globalSfxVolume;
+        startMusicVolume = startScreenMusic.volume;
         actionStateMachine = actionStateMachineComponent.StateMachine;
         gameStateMachine = StateMachine<GameStates>.Initialize(this, startingState);
+    }
+
+    void Update()
+    {
+        if (fadingOutStartMusic)
+        {
+            float elapsedTime = Time.time - fadeOutMusicTimestamp;
+            float volume = Mathf.Lerp(startMusicVolume, 0, elapsedTime / fadeOutMusicTimestamp);
+            startScreenMusic.volume = volume;
+            if (volume == 0)
+            {
+                startScreenMusic.Stop();
+                fadingOutStartMusic = false;
+            }
+        }
+    }
+
+    void StartScreen_Enter()
+    {
+        // Set Camera position
+        cameraController.enabled = false;
+        cameraController.transform.position = cameraStartScreenPosition.position;
+        // Set canvas alpha
+        SetCanvasAlpha(startScreenCanvas, 1);
+        // Mute game music and sfx
+        soundManager.globalMusicVolume = 0;
+        soundManager.globalSfxVolume = 0;
+        // Disable character state
+        actionStateMachine.ChangeState(ActionStates.Disabled);
+        // Play Music
+        startScreenMusic.Play();
+        lastStateChangeTimestamp = Time.time;
+    }
+
+    void StartScreen_Update()
+    {
+        if (playerInput.startGame)
+        {
+            gameStateMachine.ChangeState(GameStates.StartScreenToAnimationTransition);
+        }
+    }
+
+    void StartScreenToAnimationTransition_Enter()
+    {
+        // Set Camera position
+        cameraController.enabled = true;
+        cameraController.transform.position = cameraStartScreenPosition.position;
+        // Set canvas alpha
+        SetCanvasAlpha(startScreenCanvas, 1);
+        // Mute game music and sfx
+        soundManager.globalMusicVolume = 0;
+        soundManager.globalSfxVolume = 0;
+        // Disable character state
+        actionStateMachine.ChangeState(ActionStates.Disabled);
+        // Stop Music
+        startScreenStartSfx.Play();
+        fadingOutStartMusic = true;
+        lastStateChangeTimestamp = Time.time;
+        fadeOutMusicTimestamp = lastStateChangeTimestamp;
+    }
+
+    void StartScreenToAnimationTransition_Update()
+    {
+        float elapsedTime = Time.time - lastStateChangeTimestamp;
+        float alpha = Mathf.Lerp(1, 0, elapsedTime / startScreenAlphaFadeOutTime);
+        SetCanvasAlpha(startScreenCanvas, alpha);
+        if (alpha == 0)
+        {
+            gameStateMachine.ChangeState(GameStates.LevelStartAnimation);
+        }
     }
 
     void LevelStartAnimation_Enter()
@@ -42,36 +141,48 @@ public class GameStateMachine : MonoBehaviour {
         soundManager.globalMusicVolume = 0;
         soundManager.globalSfxVolume = 0;
         // Enable level start animation rendering and fade in the alpha
-        levelStartAnimationCanvas.SetActive(true);
-        SetCanvasAlpha(0, 0);
-        SetCanvasAlpha(1, levelStartAlphaFadeTime);
+        SetCanvasAlpha(levelStartAnimationCanvas, 0);
         EnableChildrenAnimators(levelStartAnimationCanvas, true);
         // Disable character state
         actionStateMachine.ChangeState(ActionStates.Disabled);
-        levelStartAnimationTimestamp = Time.time;
+        lastStateChangeTimestamp = Time.time;
     }
 
     void LevelStartAnimation_Update()
     {
+        float elapsedTime = Time.time - lastStateChangeTimestamp;
         // Slowly fade game music and sound in
-        soundManager.globalMusicVolume = Mathf.Lerp(0, globalMusicVolume, (Time.time - levelStartAnimationTimestamp) / gameplaySoundFadeInTime);
-        soundManager.globalSfxVolume = Mathf.Lerp(0, globalSfxVolume, (Time.time - levelStartAnimationTimestamp) / gameplaySoundFadeInTime);
-    }
-
-    void LevelStartAnimation_Exit()
-    {
-        SetCanvasAlpha(0, levelStartAlphaFadeTime);
+        soundManager.globalMusicVolume = Mathf.Lerp(0, globalMusicVolume, elapsedTime / gameplaySoundFadeInTime);
+        soundManager.globalSfxVolume = Mathf.Lerp(0, globalSfxVolume, elapsedTime / gameplaySoundFadeInTime);
+        float alpha = Mathf.Lerp(0, 1, elapsedTime / levelStartAlphaFadeTime);
+        SetCanvasAlpha(levelStartAnimationCanvas, alpha);
     }
 
     void OpeningEvent_Enter()
     {
         EnableChildrenAnimators(castle, true);
         actionStateMachine.ChangeState(ActionStates.Disabled);
+        lastStateChangeTimestamp = Time.time;
+    }
+
+    void OpeningEvent_Update()
+    {
+        float elapsedTime = Time.time - lastStateChangeTimestamp;
+        float alpha = Mathf.Lerp(1, 0, elapsedTime / levelStartAlphaFadeTime);
+        SetCanvasAlpha(levelStartAnimationCanvas, alpha);
     }
 
     void PlayingLevel_Enter()
     {
         actionStateMachine.ChangeState(ActionStates.Idle);
+        lastStateChangeTimestamp = Time.time;
+    }
+
+    void PlayingLevel_Update()
+    {
+        float elapsedTime = Time.time - lastStateChangeTimestamp;
+        float alpha = Mathf.Lerp(0, 1, elapsedTime / gameplayUiFadeInTime);
+        SetCanvasAlpha(gameplayUiCanvas, alpha);
     }
 
     public void OnLevelStartAnimationEnded()
@@ -90,13 +201,9 @@ public class GameStateMachine : MonoBehaviour {
         }
     }
 
-    void SetCanvasAlpha(float alpha, float time)
+    void SetCanvasAlpha(GameObject canvas, float alpha)
     {
-        Graphic[] graphics = levelStartAnimationCanvas.GetComponentsInChildren<Graphic>();
-        foreach (Graphic graphic in graphics)
-        {
-            graphic.CrossFadeAlpha(alpha, time, false);
-        }
+        canvas.GetComponent<CanvasGroup>().alpha = alpha;
     }
 
     void EnableChildrenAnimators(GameObject gameObject, bool enabled)

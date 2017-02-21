@@ -14,4 +14,5 @@ public class KeyboardMouseConfig : MonoBehaviour
     public KeyCode shot;
     public KeyCode teleport;
     public KeyCode lockAim;
+    public KeyCode[] startGame;
 }

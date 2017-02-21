@@ -104,13 +104,11 @@ public class CameraController : MonoBehaviour {
         newPosition.y = GetCameraNextPositionY();
         // Adjust camera to horizontal and vertical limits 
         SetPosition(newPosition);
-        UpdateCameraWorldCoordinates();
         newPosition.x = GetCameraPositionAdjustedX();
         newPosition.y = GetCameraPositionAdjustedY();
         // Apply aiming vertical direction and adjust camera again to vertical limit
         newPosition.y = ApplyAimingDirectionOffset(newPosition.y);
         SetPosition(newPosition);
-        UpdateCameraWorldCoordinates();
         newPosition.y = GetCameraPositionAdjustedY();
         // Finally get current position by applying smoothing
         newPosition.x = Mathf.SmoothDamp(currentPosition.x, newPosition.x, ref currentFollowDampVelocityX, cameraFollowDampTimeX);

@@ -15,9 +15,11 @@ public class PlayerInput : MonoBehaviour {
     public bool threw;
     public bool crushed;
     public bool lockAim;
+    public bool startGame;
 
     void Update()
     {
+        this.SetStartGame();
         this.SetDirection();
         this.SetJump();
         this.SetGrab();
@@ -80,6 +82,23 @@ public class PlayerInput : MonoBehaviour {
     void SetLockAim()
     {
         lockAim = Input.GetKey(this.keyboardMouseConfig.lockAim) || Input.GetKey(this.windowsGamepadConfig.lockAim);
+    }
+
+    void SetStartGame()
+    {
+        startGame = GetKey(this.keyboardMouseConfig.startGame) || GetKey(this.windowsGamepadConfig.startGame);
+    }
+
+    bool GetKey(KeyCode[] keys)
+    {
+        for (int i = 0; i < keys.Length; i++)
+        {
+            if (Input.GetKey(keys[i]))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     bool GetKeyDown(KeyCode[] keys)
