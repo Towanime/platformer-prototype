@@ -276,6 +276,7 @@ public class ActionStateMachine : MonoBehaviour {
     void Spawning_Exit()
     {
         vulnerabilityStateMachine.ChangeState(VulnerabilityStates.Invulnerable);
+        playerHealth.UpdateHearts();
     }
 
     void Spawning_Update()
@@ -290,8 +291,6 @@ public class ActionStateMachine : MonoBehaviour {
     {
         gameOverCount++;
         playerHealth.Refresh();
-        playerHealth.HealthBarDamage();
-        playerHealth.UpdateHearts();
         actionStateMachine.ChangeState(ActionStates.Spawning);
     }
 
@@ -316,6 +315,7 @@ public class ActionStateMachine : MonoBehaviour {
     {
         float damageToApply = 1;
         playerHealth.ApplyDamage(null, damageToApply);
+        playerHealth.HealthBarDamage();
         ActionStates nextState = (playerHealth.CurrentLife > 0) ? ActionStates.Spawning : ActionStates.Death;
         actionStateMachine.ChangeState(nextState);
     }
@@ -345,5 +345,10 @@ public class ActionStateMachine : MonoBehaviour {
     public StateMachine<ActionStates> StateMachine
     {
         get { return actionStateMachine; }
+    }
+
+    public int GameOverCount
+    {
+        get { return gameOverCount; }
     }
 }
