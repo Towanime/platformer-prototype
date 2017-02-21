@@ -150,8 +150,9 @@ public class ActionStateMachine : MonoBehaviour {
 
     void Shooting_FixedUpdate()
     {
+        Vector3 bulletOrigin = aimingDirectionResolver.GetAimEmitorPosition(IsGrounded);
         float aimingAngle = aimingDirectionResolver.GetAimingAngle(IsGrounded);
-        gatlingGun.Fire(aimingAngle);
+        gatlingGun.Fire(bulletOrigin, aimingAngle);
     }
 
     void Teleporting_Enter()

@@ -105,7 +105,7 @@ public class GatlingGun : MonoBehaviour {
     /// <summary>
     /// Fires a bullet
     /// </summary>
-    public bool Fire(float aimingAngle)
+    public bool Fire(Vector3 bulletOrigin, float aimingAngle)
     {
         if (!isEnabled || isOverheated) return false;
         isFiringGun = true;
@@ -114,7 +114,7 @@ public class GatlingGun : MonoBehaviour {
             GameObject bullet = BulletPool.instance.GetObject();
             // clear bullet trail
             bullet.GetComponent<TrailRenderer>().Clear();
-            bullet.transform.position = GetBulletSpawnPosition(aimingAngle);
+            bullet.transform.position = GetBulletSpawnPosition(bulletOrigin, aimingAngle);
             Bullet component = bullet.GetComponent<Bullet>();
             component.SetDirection(GetBulletDirection(aimingAngle));
             if (overrideBulletSpeed)
@@ -131,9 +131,9 @@ public class GatlingGun : MonoBehaviour {
         return false;
     }
 
-    private Vector3 GetBulletSpawnPosition(float aimingAngle)
+    private Vector3 GetBulletSpawnPosition(Vector3 bulletOrigin, float aimingAngle)
     {
-        Vector3 spawnPosition = emitor.transform.position;
+        Vector3 spawnPosition = bulletOrigin;
         // Randomize position of the bullet by a position offset;
         float randomOffset = Random.Range(-bulletSpawnPositionRandomOffset, bulletSpawnPositionRandomOffset);
         // Add offset but first convert it to the angle of the spawn point
