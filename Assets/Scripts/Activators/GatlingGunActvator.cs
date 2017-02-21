@@ -10,6 +10,7 @@ public class GatlingGunActvator : BaseActivator
     public override void Activate(GameObject trigger)
     {
         gatlingGun.IsEnabled = true;
+        SoundManager.Instance.Play(SoundManager.Instance.gatlingGunPickupSound);
     }
 
     public override void Desactivate()
