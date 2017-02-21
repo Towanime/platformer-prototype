@@ -17,41 +17,83 @@ public class GameStateMachine : MonoBehaviour {
     public GameObject castle;
     [Tooltip("State in which the game will start.")]
     public GameStates startingState = GameStates.StartScreen;
-    [Tooltip("Fade in/out time for the level start animation graphics.")]
+    [Tooltip("Fade out time for the start screen graphics.")]
     public float startScreenAlphaFadeOutTime = 0.15f;
+    [Tooltip("Fade in time for the gameplay sound and music.")]
+    public float startScreenMusicFadeOutTime = 1f;
     [Tooltip("Fade in/out time for the level start animation graphics.")]
     public float levelStartAlphaFadeTime = 0.15f;
     [Tooltip("Fade in time for the gameplay sound and music.")]
     public float gameplaySoundFadeInTime = 2f;
+    [Tooltip("Fade in time for the gameplay ui.")]
+    public float gameplayUiFadeInTime = 0.15f;
+    [Tooltip("Position of the camera when showing the start screen.")]
+    public Transform cameraStartScreenPosition;
+    public AudioSource startScreenMusic;
+    public AudioSource startScreenStartSfx;
     public SoundManager soundManager;
     public PlayerInput playerInput;
+    public CameraController cameraController;
 
     private StateMachine<ActionStates> actionStateMachine;
     private StateMachine<GameStates> gameStateMachine;
     private float globalMusicVolume;
     private float globalSfxVolume;
     /// <summary>
-    /// Moment in which the level start animation started
+    /// Moment in which the last state change happened
     /// </summary>
     private float lastStateChangeTimestamp;
-    private float elapsedTime;
+    /// <summary>
+    /// Moment in which the fade out of the start screen music started
+    /// </summary>
+    private float fadeOutMusicTimestamp;
+    /// <summary>
+    /// Initial volume of the start music
+    /// </summary>
+    private float startMusicVolume;
+    /// <summary>
+    /// If the start screen music is being fade out
+    /// </summary>
+    private bool fadingOutStartMusic;
 
     // Use this for initialization
     void Start () {
         globalMusicVolume = soundManager.globalMusicVolume;
         globalSfxVolume = soundManager.globalSfxVolume;
+        startMusicVolume = startScreenMusic.volume;
         actionStateMachine = actionStateMachineComponent.StateMachine;
         gameStateMachine = StateMachine<GameStates>.Initialize(this, startingState);
     }
 
+    void Update()
+    {
+        if (fadingOutStartMusic)
+        {
+            float elapsedTime = Time.time - fadeOutMusicTimestamp;
+            float volume = Mathf.Lerp(startMusicVolume, 0, elapsedTime / fadeOutMusicTimestamp);
+            startScreenMusic.volume = volume;
+            if (volume == 0)
+            {
+                startScreenMusic.Stop();
+                fadingOutStartMusic = false;
+            }
+        }
+    }
+
     void StartScreen_Enter()
     {
+        // Set Camera position
+        cameraController.enabled = false;
+        cameraController.transform.position = cameraStartScreenPosition.position;
+        // Set canvas alpha
         SetCanvasAlpha(startScreenCanvas, 1);
         // Mute game music and sfx
         soundManager.globalMusicVolume = 0;
         soundManager.globalSfxVolume = 0;
         // Disable character state
         actionStateMachine.ChangeState(ActionStates.Disabled);
+        // Play Music
+        startScreenMusic.Play();
         lastStateChangeTimestamp = Time.time;
     }
 
@@ -65,13 +107,21 @@ public class GameStateMachine : MonoBehaviour {
 
     void StartScreenToAnimationTransition_Enter()
     {
+        // Set Camera position
+        cameraController.enabled = true;
+        cameraController.transform.position = cameraStartScreenPosition.position;
+        // Set canvas alpha
         SetCanvasAlpha(startScreenCanvas, 1);
         // Mute game music and sfx
         soundManager.globalMusicVolume = 0;
         soundManager.globalSfxVolume = 0;
         // Disable character state
         actionStateMachine.ChangeState(ActionStates.Disabled);
+        // Stop Music
+        startScreenStartSfx.Play();
+        fadingOutStartMusic = true;
         lastStateChangeTimestamp = Time.time;
+        fadeOutMusicTimestamp = lastStateChangeTimestamp;
     }
 
     void StartScreenToAnimationTransition_Update()
@@ -112,6 +162,7 @@ public class GameStateMachine : MonoBehaviour {
     {
         EnableChildrenAnimators(castle, true);
         actionStateMachine.ChangeState(ActionStates.Disabled);
+        lastStateChangeTimestamp = Time.time;
     }
 
     void OpeningEvent_Update()
@@ -124,6 +175,14 @@ public class GameStateMachine : MonoBehaviour {
     void PlayingLevel_Enter()
     {
         actionStateMachine.ChangeState(ActionStates.Idle);
+        lastStateChangeTimestamp = Time.time;
+    }
+
+    void PlayingLevel_Update()
+    {
+        float elapsedTime = Time.time - lastStateChangeTimestamp;
+        float alpha = Mathf.Lerp(0, 1, elapsedTime / gameplayUiFadeInTime);
+        SetCanvasAlpha(gameplayUiCanvas, alpha);
     }
 
     public void OnLevelStartAnimationEnded()
