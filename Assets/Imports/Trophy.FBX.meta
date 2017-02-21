@@ -1,0 +1,137 @@
+fileFormatVersion: 2
+guid: 4a970e6e74612d24a98d6be14556f744
+timeCreated: 1487657342
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: Handle
+    100002: Handle001
+    100004: SkullCoin
+    100006: Spike
+    100008: Spike001
+    100010: Spike002
+    100012: Spike003
+    100014: Spike004
+    100016: Spike005
+    100018: Spike006
+    100020: Spike007
+    100022: //RootNode
+    100024: Trophy
+    400000: Handle
+    400002: Handle001
+    400004: SkullCoin
+    400006: Spike
+    400008: Spike001
+    400010: Spike002
+    400012: Spike003
+    400014: Spike004
+    400016: Spike005
+    400018: Spike006
+    400020: Spike007
+    400022: Trophy
+    400024: //RootNode
+    2300000: Handle
+    2300002: Handle001
+    2300004: SkullCoin
+    2300006: Spike
+    2300008: Spike001
+    2300010: Spike002
+    2300012: Spike003
+    2300014: Spike004
+    2300016: Spike005
+    2300018: Spike006
+    2300020: Spike007
+    2300022: Trophy
+    3300000: Handle
+    3300002: Handle001
+    3300004: SkullCoin
+    3300006: Spike
+    3300008: Spike001
+    3300010: Spike002
+    3300012: Spike003
+    3300014: Spike004
+    3300016: Spike005
+    3300018: Spike006
+    3300020: Spike007
+    3300022: Trophy
+    4300000: SkullCoin
+    4300002: Trophy
+    4300004: Handle
+    4300006: Spike
+    4300008: Handle001
+    4300010: Spike001
+    4300012: Spike002
+    4300014: Spike003
+    4300016: Spike004
+    4300018: Spike005
+    4300020: Spike006
+    4300022: Spike007
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
