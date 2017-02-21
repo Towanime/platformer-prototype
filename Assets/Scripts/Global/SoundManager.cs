@@ -20,6 +20,7 @@ public class SoundManager : MonoBehaviour {
     public AudioClipInfo reachedOverheatSound;
     public AudioClipInfo loadingGunSound;
     public AudioClipInfo coinPickupSound;
+    public AudioClipInfo bigCoinPickupSound;
     public AudioClipInfo bulletSpawnSound;
     public AudioClipInfo soulPickupSound;
     public AudioClipInfo shadowWalkSound;

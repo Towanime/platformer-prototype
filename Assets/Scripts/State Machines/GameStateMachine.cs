@@ -29,11 +29,14 @@ public class GameStateMachine : MonoBehaviour {
     public float gameplayUiFadeInTime = 0.15f;
     [Tooltip("Position of the camera when showing the start screen.")]
     public Transform cameraStartScreenPosition;
+    [Tooltip("Time that the player walks automatically before giving control to the player.")]
+    public float playerWalkingTime = 0.8f;
     public AudioSource startScreenMusic;
     public AudioSource startScreenStartSfx;
     public SoundManager soundManager;
     public PlayerInput playerInput;
     public CameraController cameraController;
+    public CharacterMovement characterMovement;
 
     private StateMachine<ActionStates> actionStateMachine;
     private StateMachine<GameStates> gameStateMachine;
@@ -158,18 +161,35 @@ public class GameStateMachine : MonoBehaviour {
         SetCanvasAlpha(levelStartAnimationCanvas, alpha);
     }
 
-    void OpeningEvent_Enter()
+    void CastleGatesOpening_Enter()
     {
         EnableChildrenAnimators(castle, true);
         actionStateMachine.ChangeState(ActionStates.Disabled);
         lastStateChangeTimestamp = Time.time;
     }
 
-    void OpeningEvent_Update()
+    void CastleGatesOpening_Update()
     {
         float elapsedTime = Time.time - lastStateChangeTimestamp;
         float alpha = Mathf.Lerp(1, 0, elapsedTime / levelStartAlphaFadeTime);
         SetCanvasAlpha(levelStartAnimationCanvas, alpha);
+    }
+
+    void PlayerWalkingOut_Enter()
+    {
+        actionStateMachine.ChangeState(ActionStates.Disabled);
+        lastStateChangeTimestamp = Time.time;
+    }
+
+    void PlayerWalkingOut_FixedUpdate()
+    {
+        characterMovement.UpdateInput(1, false);
+        characterMovement.Move();
+        float elapsedTime = Time.time - lastStateChangeTimestamp;
+        if (elapsedTime >= playerWalkingTime)
+        {
+            gameStateMachine.ChangeState(GameStates.PlayingLevel);
+        }
     }
 
     void PlayingLevel_Enter()
@@ -189,15 +209,15 @@ public class GameStateMachine : MonoBehaviour {
     {
         if (gameStateMachine.State == GameStates.LevelStartAnimation)
         {
-            gameStateMachine.ChangeState(GameStates.OpeningEvent);
+            gameStateMachine.ChangeState(GameStates.CastleGatesOpening);
         }
     }
 
     public void OnOpeningEventEnded()
     {
-        if (gameStateMachine.State == GameStates.OpeningEvent)
+        if (gameStateMachine.State == GameStates.CastleGatesOpening)
         {
-            gameStateMachine.ChangeState(GameStates.PlayingLevel);
+            gameStateMachine.ChangeState(GameStates.PlayerWalkingOut);
         }
     }
 

@@ -7,6 +7,7 @@ public enum GameStates {
     StartScreen,
     StartScreenToAnimationTransition,
     LevelStartAnimation,
-    OpeningEvent,
+    CastleGatesOpening,
+    PlayerWalkingOut,
     PlayingLevel
 }
