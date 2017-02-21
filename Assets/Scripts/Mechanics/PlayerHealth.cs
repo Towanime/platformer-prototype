@@ -22,6 +22,12 @@ public class PlayerHealth : DamageableEntity {
     public float knockbackForceY;
     public CharacterMovement characterMovement;
     public AimingDirectionResolver aimingDirectionResolver;
+    // health bar variables
+    [Tooltip("It will be shown when the player gets damage.")]
+    public RawImage damageBar;
+    public float damageBarTime = 1;
+    [Tooltip("Hearts to hide or show when damaged or respawned.")]
+    public GameObject[] hearts;
     private bool renderingEnabled;
     private float elapsedKnockbackTime;
     private float elapsedInvulnerableTime;
@@ -87,6 +93,32 @@ public class PlayerHealth : DamageableEntity {
             return true;
         }
         return false;
+    }
+
+    public void HealthBarDamage()
+    {
+        damageBar.enabled = !damageBar.enabled;
+        // only turn it off after x seconds if it's enabled
+        if (damageBar.enabled)
+        {
+            Invoke("HealthBarDamage", damageBarTime);
+        }
+    }
+
+    public void UpdateHearts()
+    {
+        //int i = hearts.Length;
+        // update hearts
+        for (int i = 0; i < hearts.Length; i++)
+        {
+            if (i + 1 <= currentLife)
+            {
+                hearts[i].SetActive(true);
+            }else
+            {
+                hearts[i].SetActive(false);
+            }
+        }
     }
 
     private void UpdateFlicker()

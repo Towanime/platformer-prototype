@@ -245,6 +245,8 @@ public class ActionStateMachine : MonoBehaviour {
         movementStateMachine.ChangeState(MovementStates.InputDisabled);
         aimStateMachine.ChangeState(AimStates.Disabled);
         playerHealth.BeginKnockback(damageOrigin);
+        playerHealth.HealthBarDamage();
+        playerHealth.UpdateHearts();
         SoundManager.Instance.PlayRandom(SoundManager.Instance.avatarPainSounds);
     }
 
@@ -288,6 +290,8 @@ public class ActionStateMachine : MonoBehaviour {
     {
         gameOverCount++;
         playerHealth.Refresh();
+        playerHealth.HealthBarDamage();
+        playerHealth.UpdateHearts();
         actionStateMachine.ChangeState(ActionStates.Spawning);
     }
 
