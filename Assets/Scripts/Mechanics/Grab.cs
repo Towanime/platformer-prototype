@@ -95,7 +95,7 @@ public class Grab : MonoBehaviour
                 if (fracJourney >= 1)
                 {
                     Comeback(true);
-                    Debug.Log("Arm reached max distance! At: " + arm.transform.position.ToString());
+                    //Debug.Log("Arm reached max distance! At: " + arm.transform.position.ToString());
                 }
                 break;
 
@@ -106,7 +106,7 @@ public class Grab : MonoBehaviour
                 {
                     // finish grab
                     End();
-                    Debug.Log("Arm returned empty handed! At: " + arm.transform.position.ToString());
+                    //Debug.Log("Arm returned empty handed! At: " + arm.transform.position.ToString());
                 }
                 break;
         }
@@ -151,7 +151,7 @@ public class Grab : MonoBehaviour
 
         // enable grab trigger!
         arm.GetComponent<Collider>().enabled = true;
-        Debug.Log("Begin thrown at: " + armAnchor.transform.position.ToString() + " - with limit: " + targetPosition.ToString());
+        //Debug.Log("Begin thrown at: " + armAnchor.transform.position.ToString() + " - with limit: " + targetPosition.ToString());
     }
 
 
